@@ -1,37 +1,54 @@
-import { useState } from 'react'
-import './App.css'
-import HomePage from './pages/HomePage.jsx'
-import UserTypePage from './pages/UserTypePage.jsx'
-import StudentLoginPage from './pages/StudentLoginPage.jsx'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 
-function App() {
-  const [page, setPage] = useState('home')
-  const [selectedUser, setSelectedUser] = useState(null)
+import StudentLogin from "./pages/login/StudentLogin.jsx";
+import LibrarianLogin from "./pages/login/librarianlogin.jsx";
 
-  const handleGetStarted = () => setPage('userType')
-  const handleSelectUser = (type) => {
-    setSelectedUser(type)
-    if (type === 'student') {
-      setPage('studentLogin')
-    } else {
-      setPage('userType')
-      alert(`The ${type} login page is not implemented yet.`)
-    }
-  }
-  const handleLogin = () => setPage('home')
+import StudentDashboard from "./pages/Dashboard/studentdashboard.jsx";
+import LibrarianDashboard from "./pages/Dashboard/libratianDashboard.jsx";
 
-  return (
-    <div className="app-root">
-      {page === 'home' && <HomePage onGetStarted={handleGetStarted} />}
-      {page === 'userType' && <UserTypePage onSelect={handleSelectUser} />}
-      {page === 'studentLogin' && <StudentLoginPage onLogin={handleLogin} />}
-      {page === 'home' && selectedUser && (
-        <div style={{ position: 'fixed', bottom: 16, left: 16 }}>
-          Selected: {selectedUser}
-        </div>
-      )}
-    </div>
-  )
+function ProtectedRoute({ children, allowedRoles }) {
+  const { user } = useAuth();
+  
+  if (!user) return <Navigate to="/" />;
+  if (!allowedRoles.includes(user.role)) return <Navigate to="/" />;
+  
+  return children;
 }
 
-export default App
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/student-login" element={<StudentLogin />} />
+          <Route path="/librarian-login" element={<LibrarianLogin />} />
+
+          <Route path="/student-dashboard" element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentDashboard />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/librarian-dashboard" element={
+            <ProtectedRoute allowedRoles={["librarian"]}>
+              <LibrarianDashboard />
+            </ProtectedRoute>
+          } />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+function Home() {
+  return (
+    <div style={{ textAlign: "center", marginTop: "100px" }}>
+      <h1>📚 Library Management System</h1>
+      <p><a href="/student-login">Student Login</a> | <a href="/librarian-login">Librarian Login</a></p>
+    </div>
+  );
+}
+
+export default App;
