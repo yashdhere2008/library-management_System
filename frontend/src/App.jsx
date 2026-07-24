@@ -7,6 +7,11 @@ import LibrarianLogin from "./pages/login/librarianlogin.jsx";
 import StudentDashboard from "./pages/Dashboard/studentdashboard.jsx";
 import LibrarianDashboard from "./pages/Dashboard/libratianDashboard.jsx";
 
+import LibraryPortal from './components/LibraryPortal';
+function App() {
+  return <LibraryPortal />;
+}
+
 function ProtectedRoute({ children, allowedRoles }) {
   const { user } = useAuth();
   

@@ -6,11 +6,17 @@ import authRoutes from "./Controller/authroutes.js";
 
 dotenv.config();
 
+
 connectDB();
 
 const app = express();
 
-app.use(cors());
+// ✅ Better CORS for development
+app.use(cors({
+  origin: "http://localhost:3000",   // Your React frontend
+  credentials: true
+}));
+
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
@@ -19,7 +25,6 @@ app.get("/", (req, res) => {
   res.send("Library Management API Running");
 });
 
-// ✅ Changed to 5001 to avoid conflict
 const PORT = process.env.PORT || 5005;
 
 app.listen(PORT, () => {
