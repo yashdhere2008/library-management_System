@@ -1,0 +1,515 @@
+
+
+Admin dashboard · HTML
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Admin Dashboard</title>
+<style>
+body{margin:0;font-family:Arial;background:#f2f2f2;color:#000}
+.sidebar{position:fixed;left:0;top:0;width:240px;height:100%;background:#000;color:#fff;padding:20px;overflow-y:auto}
+.sidebar h2{margin:0 0 20px}
+.sidebar a{display:block;color:#fff;text-decoration:none;padding:10px;border-radius:6px;margin:6px 0;cursor:pointer}
+.sidebar a:hover{background:#333}
+.logout{background:#000;border:1px solid #fff;margin-top:20px !important}
+.main{margin-left:260px;padding:20px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.card{background:#fff;padding:20px;border-radius:10px;border:1px solid #000;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+table{width:100%;border-collapse:collapse;background:#fff;margin-top:20px;border:1px solid #000}
+th,td{padding:12px;border-bottom:1px solid #ccc;text-align:left}
+th{background:#000;color:#fff}
+button{padding:8px 12px;border:1px solid #000;border-radius:6px;background:#000;color:#fff;cursor:pointer}
+button:hover{opacity:0.8}
+.reject{background:#fff;color:#000;border:1px solid #000}
+input,select,textarea{padding:8px 12px;border:1px solid #000;border-radius:6px;font-size:14px;width:100%;box-sizing:border-box}
+form{background:#fff;padding:20px;border-radius:10px;border:1px solid #000;box-shadow:0 2px 8px rgba(0,0,0,.15);margin-top:20px}
+.form-group{margin-bottom:15px}
+.form-group label{display:block;font-weight:600;margin-bottom:5px;color:#000}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+h1{color:#000}
+h2{color:#000;margin-top:25px}
+.success-msg{background:#fff;color:#000;border:1px solid #000;padding:10px;border-radius:6px;margin-bottom:10px;display:none}
+.error-msg{background:#fff;color:#000;border:1px solid #000;padding:10px;border-radius:6px;margin-bottom:10px;display:none}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.badge{display:inline-block;padding:3px 8px;border-radius:12px;font-size:12px;font-weight:600;border:1px solid #000}
+.badge-green{background:#000;color:#fff}
+.badge-red{background:#fff;color:#000}
+.badge-yellow{background:#ccc;color:#000}
+.badge-blue{background:#666;color:#fff}
+.stat-bar{background:#e0e0e0;height:20px;border-radius:10px;overflow:hidden;margin:8px 0;border:1px solid #000}
+.stat-bar-fill{height:100%;background:#000;border-radius:10px;color:#fff;font-size:11px;line-height:20px;padding-left:8px;text-align:center}
+.tabs{display:flex;gap:0;margin-bottom:20px;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #000;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.tab{padding:12px 20px;cursor:pointer;font-weight:600;border-bottom:3px solid transparent;transition:all 0.2s}
+.tab:hover{background:#eee}
+.tab.active{background:#000;color:#fff}
+.panel{background:#fff;border-radius:10px;padding:20px;border:1px solid #000;box-shadow:0 2px 8px rgba(0,0,0,.15);margin-bottom:20px}
+.panel h3{margin-top:0}
+</style></head>
+<body>
+<div class="sidebar">
+<h2>🛡️ Admin</h2>
+<a onclick="showSection('dashboard')">🏠 Dashboard</a>
+<a onclick="showSection('users')">👥 Manage Users</a>
+<a onclick="showSection('librarians')">👩‍💼 Manage Librarians</a>
+<a onclick="showSection('books')">📚 All Books</a>
+<a onclick="showSection('transactions')">📋 Transactions</a>
+<a onclick="showSection('reports')">📊 Reports</a>
+<a onclick="showSection('logs')">📜 Activity Logs</a>
+<a onclick="showSection('settings')">⚙ Settings</a>
+<a href="login.html" class="logout">🚪 Logout</a>
+</div>
+ 
+<div class="main">
+ 
+<!-- ==================== DASHBOARD ==================== -->
+<div id="dashboard">
+<h1>Admin Dashboard</h1>
+<div class="cards">
+<div class="card"><h3>Total Users</h3><h1 id="totalUsers">1,250</h1></div>
+<div class="card"><h3>Total Books</h3><h1 id="totalBooks">5,200</h1></div>
+<div class="card"><h3>Issued Books</h3><h1 id="totalIssued">210</h1></div>
+<div class="card"><h3>Pending Fines</h3><h1 id="totalFines">₹535</h1></div>
+</div>
+<div class="cards" style="margin-top:15px">
+<div class="card"><h3>Students</h3><h1>1,240</h1></div>
+<div class="card"><h3>Librarians</h3><h1 id="libCount">4</h1></div>
+<div class="card"><h3>Overdue Books</h3><h1>12</h1></div>
+<div class="card"><h3>Today's Issues</h3><h1>8</h1></div>
+</div>
+ 
+<h2>Quick Actions</h2>
+<div class="cards" style="grid-template-columns:repeat(3,1fr)">
+<div class="card" style="cursor:pointer" onclick="showSection('users')">
+<h3>➕ Add New User</h3>
+<p style="color:#333">Register students or librarians</p>
+</div>
+<div class="card" style="cursor:pointer" onclick="showSection('librarians')">
+<h3>👩‍💼 Manage Staff</h3>
+<p style="color:#333">Add/remove librarians</p>
+</div>
+<div class="card" style="cursor:pointer" onclick="showSection('reports')">
+<h3>📊 View Reports</h3>
+<p style="color:#333">See system analytics</p>
+</div>
+</div>
+ 
+<h2>Recent System Activity</h2>
+<table>
+<tr><th>Timestamp</th><th>User</th><th>Action</th><th>Status</th></tr>
+<tr><td>2024-01-15 10:30</td><td>Priya Nair (Librarian)</td><td>Issued "Java Programming" to Praniti Shinde</td><td><span class="badge badge-green">Success</span></td></tr>
+<tr><td>2024-01-15 09:45</td><td>Rahul Patil (Student)</td><td>Returned "DBMS"</td><td><span class="badge badge-green">Success</span></td></tr>
+<tr><td>2024-01-15 09:00</td><td>System</td><td>Backup completed</td><td><span class="badge badge-green">Success</span></td></tr>
+<tr><td>2024-01-14 16:20</td><td>Sneha Joshi (Student)</td><td>Requested "Python Basics"</td><td><span class="badge badge-yellow">Pending</span></td></tr>
+</table>
+</div>
+ 
+<!-- ==================== MANAGE USERS ==================== -->
+<div id="users" style="display:none;">
+<div class="section-title"><h1>👥 Manage Users</h1><span id="userCount" style="color:#333;font-size:16px"></span></div>
+ 
+<div class="tabs">
+<div class="tab active" onclick="switchUserTab(this,'all')">All Users</div>
+<div class="tab" onclick="switchUserTab(this,'students')">Students</div>
+<div class="tab" onclick="switchUserTab(this,'librarians')">Librarians</div>
+</div>
+ 
+<div id="addUserSuccess" class="success-msg">✅ User added successfully!</div>
+ 
+<form onsubmit="addUser(event)" style="margin-top:0">
+<h3>➕ Add New User</h3>
+<div class="form-row">
+<div class="form-group"><label>Full Name</label><input type="text" id="userName" required></div>
+<div class="form-group"><label>Email</label><input type="email" id="userEmail" required></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Role</label>
+<select id="userRole">
+<option value="student">Student</option>
+<option value="librarian">Librarian</option>
+<option value="admin">Admin</option>
+</select></div>
+<div class="form-group"><label>Department (for students)</label>
+<select id="userDept">
+<option>Computer Science</option>
+<option>Electronics</option>
+<option>Mechanical</option>
+<option>Civil</option>
+<option>Electrical</option>
+</select></div>
+</div>
+<div class="form-group"><label>Password</label><input type="password" id="userPass" value="password123"></div>
+<button type="submit" style="padding:12px 24px;font-size:16px">➕ Add User</button>
+</form>
+ 
+<table id="userTable">
+<tr><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Action</th></tr>
+</table>
+</div>
+ 
+<!-- ==================== MANAGE LIBRARIANS ==================== -->
+<div id="librarians" style="display:none;">
+<div class="section-title"><h1>👩‍💼 Manage Librarians</h1><span id="libCountDisplay" style="color:#333;font-size:16px"></span></div>
+ 
+<div id="libSuccess" class="success-msg">✅ Librarian added successfully!</div>
+ 
+<form onsubmit="addLibrarian(event)">
+<h3>➕ Add New Librarian</h3>
+<div class="form-row">
+<div class="form-group"><label>Full Name</label><input type="text" id="libName" required></div>
+<div class="form-group"><label>Email</label><input type="email" id="libEmail" required></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Employee ID</label><input type="text" id="libEmpId" required></div>
+<div class="form-group"><label>Shift</label>
+<select id="libShift">
+<option>Morning (6AM-2PM)</option>
+<option>Evening (2PM-10PM)</option>
+<option>Night (10PM-6AM)</option>
+</select></div>
+</div>
+<div class="form-group"><label>Phone</label><input type="text" id="libPhone"></div>
+<button type="submit" style="padding:12px 24px;font-size:16px">➕ Add Librarian</button>
+</form>
+ 
+<table id="libTable">
+<tr><th>Name</th><th>Email</th><th>Employee ID</th><th>Shift</th><th>Phone</th><th>Status</th><th>Action</th></tr>
+</table>
+</div>
+ 
+<!-- ==================== ALL BOOKS ==================== -->
+<div id="books" style="display:none;">
+<div class="section-title"><h1>📚 All Books in Library</h1><span id="allBookCount" style="color:#333;font-size:16px"></span></div>
+<input type="text" id="adminBookSearch" placeholder="Search by title, author or ISBN..." onkeyup="searchAdminBooks()" style="padding:10px;width:300px;margin-bottom:10px">
+<table id="adminBookTable">
+<tr><th>Book</th><th>Author</th><th>ISBN</th><th>Category</th><th>Total Qty</th><th>Available</th><th>Issued</th></tr>
+</table>
+</div>
+ 
+<!-- ==================== TRANSACTIONS ==================== -->
+<div id="transactions" style="display:none;">
+<h1>📋 All Transactions</h1>
+<div class="tabs">
+<div class="tab active" onclick="switchTxTab(this,'all')">All</div>
+<div class="tab" onclick="switchTxTab(this,'issued')">Issued</div>
+<div class="tab" onclick="switchTxTab(this,'returned')">Returned</div>
+</div>
+<table id="txTable">
+<tr><th>Date</th><th>Student</th><th>Book</th><th>Type</th><th>Status</th></tr>
+</table>
+</div>
+ 
+<!-- ==================== REPORTS ==================== -->
+<div id="reports" style="display:none;">
+<h1>📊 System Reports</h1>
+<div class="cards">
+<div class="card"><h3>Total Users</h3><h1>1,250</h1><p style="color:#333;font-size:13px">↑ 12% this month</p></div>
+<div class="card"><h3>Active Today</h3><h1>47</h1><p style="color:#333;font-size:13px">Users logged in today</p></div>
+<div class="card"><h3>Books Circulated</h3><h1>2,140</h1><p style="color:#333;font-size:13px">This month</p></div>
+<div class="card"><h3>Revenue from Fines</h3><h1>₹3,250</h1><p style="color:#333;font-size:13px">This month</p></div>
+</div>
+ 
+<div class="panel">
+<h3>Library Performance</h3>
+<div class="form-group"><label>Books Circulated (82%)</label><div class="stat-bar"><div class="stat-bar-fill" style="width:82%">82%</div></div></div>
+<div class="form-group"><label>On-time Returns (91%)</label><div class="stat-bar"><div class="stat-bar-fill" style="width:91%;background:#333">91%</div></div></div>
+<div class="form-group"><label>New Registrations (40%)</label><div class="stat-bar"><div class="stat-bar-fill" style="width:40%;background:#666">40%</div></div></div>
+<div class="form-group"><label>Inventory Utilization (55%)</label><div class="stat-bar"><div class="stat-bar-fill" style="width:55%;background:#999">55%</div></div></div>
+ 
+<h2>Monthly Reports</h2>
+<table>
+<tr><th>Month</th><th>New Users</th><th>Books Issued</th><th>Books Returned</th><th>Fines Collected</th></tr>
+<tr><td>January 2024</td><td>45</td><td>210</td><td>195</td><td>₹1,250</td></tr>
+<tr><td>December 2023</td><td>52</td><td>245</td><td>238</td><td>₹980</td></tr>
+<tr><td>November 2023</td><td>38</td><td>198</td><td>185</td><td>₹720</td></tr>
+<tr><td>October 2023</td><td>61</td><td>267</td><td>252</td><td>₹1,480</td></tr>
+</table>
+</div>
+</div>
+ 
+<!-- ==================== ACTIVITY LOGS ==================== -->
+<div id="logs" style="display:none;">
+<h1>📜 Activity Logs</h1>
+<input type="text" id="logSearch" placeholder="Search logs..." onkeyup="searchLogs()" style="padding:10px;width:300px;margin-bottom:10px">
+<table id="logTable">
+<tr><th>Timestamp</th><th>User</th><th>Action</th><th>IP Address</th><th>Status</th></tr>
+<tr><td>2024-01-15 10:30:15</td><td>Priya Nair</td><td>Issued book: Java Programming</td><td>192.168.1.101</td><td><span class="badge badge-green">Success</span></td></tr>
+<tr><td>2024-01-15 10:25:42</td><td>System</td><td>Database backup started</td><td>127.0.0.1</td><td><span class="badge badge-green">Success</span></td></tr>
+<tr><td>2024-01-15 10:20:08</td><td>Rahul Patil</td><td>Login attempt</td><td>192.168.1.105</td><td><span class="badge badge-green">Success</span></td></tr>
+<tr><td>2024-01-15 10:15:33</td><td>Unknown</td><td>Failed login attempt</td><td>10.0.0.55</td><td><span class="badge badge-red">Failed</span></td></tr>
+<tr><td>2024-01-15 10:10:00</td><td>Admin</td><td>Updated library settings</td><td>192.168.1.1</td><td><span class="badge badge-green">Success</span></td></tr>
+<tr><td>2024-01-15 10:05:22</td><td>Sneha Joshi</td><td>Returned book: Python Basics</td><td>192.168.1.108</td><td><span class="badge badge-green">Success</span></td></tr>
+</table>
+</div>
+ 
+<!-- ==================== SETTINGS ==================== -->
+<div id="settings" style="display:none;">
+<h1>⚙ System Settings</h1>
+<div id="settingsSuccess" class="success-msg">✅ Settings saved successfully!</div>
+ 
+<div class="panel">
+<h3>Library Configuration</h3>
+<form onsubmit="saveAdminSettings(event)">
+<div class="form-row">
+<div class="form-group"><label>Library Name</label><input type="text" id="sysLibName" value="Athenaeum Library"></div>
+<div class="form-group"><label>Max Books Per Student</label><input type="number" id="sysMaxBooks" value="5" min="1"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Fine Per Day (₹)</label><input type="number" id="sysFine" value="5" min="0"></div>
+<div class="form-group"><label>Loan Period (Days)</label><input type="number" id="sysLoanPeriod" value="14" min="1"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Max Renewals Allowed</label><input type="number" id="sysRenewals" value="2" min="0"></div>
+<div class="form-group"><label>Library Phone</label><input type="text" id="sysPhone" value="+91-1234567890"></div>
+</div>
+<div class="form-group"><label>Library Address</label><textarea id="sysAddress" rows="2">123 Education Street, Campus Area, City - 410001</textarea></div>
+<button type="submit" style="padding:12px 24px;font-size:16px">💾 Save Settings</button>
+</form>
+</div>
+ 
+<div class="panel">
+<h3>System Maintenance</h3>
+<button onclick="backupSystem()" style="background:#000;padding:12px 20px;margin-right:10px">💾 Backup Database</button>
+<button onclick="clearCache()" style="background:#444;padding:12px 20px;margin-right:10px">🧹 Clear Cache</button>
+<button onclick="restartSystem()" style="background:#fff;color:#000;border:1px solid #000;padding:12px 20px">🔄 Restart System</button>
+</div>
+ 
+</div>
+ 
+<script>
+// ============ NAVIGATION ============
+function hideAll(){
+const sections = ["dashboard","users","librarians","books","transactions","reports","logs","settings"];
+sections.forEach(id => {
+let el = document.getElementById(id);
+if(el) el.style.display = "none";
+});
+}
+ 
+function showSection(id){
+hideAll();
+let el = document.getElementById(id);
+if(el) el.style.display = "block";
+}
+ 
+// ============ USERS DATA ============
+let users = [
+{name:"Praniti Shinde", email:"praniti@college.edu", role:"student", dept:"Computer Science", status:"Active"},
+{name:"Rahul Patil", email:"rahul@college.edu", role:"student", dept:"Computer Science", status:"Active"},
+{name:"Sneha Joshi", email:"sneha@college.edu", role:"student", dept:"Computer Science", status:"Active"},
+{name:"Amit Kumar", email:"amit@college.edu", role:"student", dept:"Electronics", status:"Active"},
+{name:"Priya Sharma", email:"priya@college.edu", role:"student", dept:"Mechanical", status:"Warning"},
+{name:"Kiran Patil", email:"kiran@college.edu", role:"student", dept:"Civil", status:"Overdue"},
+{name:"Priya Nair", email:"priya.nair@library.edu", role:"librarian", dept:"Library", status:"Active"},
+{name:"Rohan Singh", email:"rohan@library.edu", role:"librarian", dept:"Library", status:"Active"},
+{name:"Admin", email:"admin@library.edu", role:"admin", dept:"Administration", status:"Active"}
+];
+ 
+let librarians = [
+{name:"Priya Nair", email:"priya.nair@library.edu", empId:"LIB001", shift:"Morning (6AM-2PM)", phone:"+91-9876543210", status:"Active"},
+{name:"Rohan Singh", email:"rohan@library.edu", empId:"LIB002", shift:"Evening (2PM-10PM)", phone:"+91-9876543211", status:"Active"},
+{name:"Meera Shah", email:"meera@library.edu", empId:"LIB003", shift:"Morning (6AM-2PM)", phone:"+91-9876543212", status:"Active"},
+{name:"Vikram Joshi", email:"vikram@library.edu", empId:"LIB004", shift:"Night (10PM-6AM)", phone:"+91-9876543213", status:"Active"}
+];
+ 
+let books = [
+{name:"Java Programming", author:"James Gosling", isbn:"978-0-13-468599-1", cat:"Programming", total:10, avail:6, issued:4},
+{name:"DBMS", author:"Korth", isbn:"978-0-07-120413-8", cat:"Database", total:5, avail:3, issued:2},
+{name:"Python Basics", author:"Guido Rossum", isbn:"978-1-49-195766-8", cat:"Programming", total:8, avail:5, issued:3},
+{name:"Data Structures", author:"Mark Weiss", isbn:"978-0-13-284737-7", cat:"Programming", total:3, avail:0, issued:3},
+{name:"Operating Systems", author:"Tanenbaum", isbn:"978-0-13-359162-0", cat:"Networking", total:6, avail:4, issued:2},
+{name:"Computer Networks", author:"Kurose", isbn:"978-0-13-676354-5", cat:"Networking", total:4, avail:3, issued:1},
+{name:"Discrete Mathematics", author:"Rosen", isbn:"978-0-07-338309-5", cat:"Mathematics", total:7, avail:5, issued:2}
+];
+ 
+let transactions = [
+{date:"2024-01-15", student:"Praniti Shinde", book:"Java Programming", type:"Issued", status:"Active"},
+{date:"2024-01-15", student:"Rahul Patil", book:"DBMS", type:"Returned", status:"Completed"},
+{date:"2024-01-14", student:"Sneha Joshi", book:"Python Basics", type:"Issued", status:"Active"},
+{date:"2024-01-14", student:"Amit Kumar", book:"Data Structures", type:"Issued", status:"Active"},
+{date:"2024-01-13", student:"Priya Sharma", book:"Operating Systems", type:"Returned", status:"Completed"},
+{date:"2024-01-12", student:"Kiran Patil", book:"Computer Networks", type:"Issued", status:"Active"}
+];
+ 
+// ============ RENDER FUNCTIONS ============
+function renderUsers(filter){
+let filtered = users;
+if(filter === 'students') filtered = users.filter(u => u.role === 'student');
+if(filter === 'librarians') filtered = users.filter(u => u.role === 'librarian');
+ 
+let html = "<tr><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Action</th></tr>";
+filtered.forEach((u, i) => {
+let badge = u.status === 'Active' ? 'badge-green' : u.status === 'Warning' ? 'badge-yellow' : 'badge-red';
+let realIdx = users.indexOf(u);
+html += `<tr>
+<td>${u.name}</td><td>${u.email}</td><td>${u.role.charAt(0).toUpperCase()+u.role.slice(1)}</td>
+<td>${u.dept}</td><td><span class="badge ${badge}">${u.status}</span></td>
+<td><button onclick="toggleUserStatus(${realIdx})">${u.status === 'Active' ? 'Suspend' : 'Activate'}</button> <button class="reject" onclick="deleteUser(${realIdx})">Remove</button></td>
+</tr>`;
+});
+document.getElementById("userTable").innerHTML = html;
+document.getElementById("userCount").textContent = `(${filtered.length} users)`;
+}
+ 
+function renderLibrarians(){
+let html = "<tr><th>Name</th><th>Email</th><th>Employee ID</th><th>Shift</th><th>Phone</th><th>Status</th><th>Action</th></tr>";
+librarians.forEach((l, i) => {
+html += `<tr>
+<td>${l.name}</td><td>${l.email}</td><td>${l.empId}</td><td>${l.shift}</td>
+<td>${l.phone}</td><td><span class="badge badge-green">${l.status}</span></td>
+<td><button onclick="removeLibrarian(${i})" class="reject">Remove</button></td>
+</tr>`;
+});
+document.getElementById("libTable").innerHTML = html;
+document.getElementById("libCountDisplay").textContent = `(${librarians.length} librarians)`;
+document.getElementById("libCount").textContent = librarians.length;
+}
+ 
+function renderAdminBooks(){
+let html = "<tr><th>Book</th><th>Author</th><th>ISBN</th><th>Category</th><th>Total Qty</th><th>Available</th><th>Issued</th></tr>";
+books.forEach(b => {
+html += `<tr>
+<td>${b.name}</td><td>${b.author}</td><td>${b.isbn}</td><td>${b.cat}</td>
+<td>${b.total}</td><td>${b.avail}</td><td>${b.issued}</td>
+</tr>`;
+});
+document.getElementById("adminBookTable").innerHTML = html;
+document.getElementById("allBookCount").textContent = `(${books.length} titles)`;
+}
+ 
+function renderTransactions(filter){
+let filtered = transactions;
+if(filter === 'issued') filtered = transactions.filter(t => t.type === 'Issued');
+if(filter === 'returned') filtered = transactions.filter(t => t.type === 'Returned');
+ 
+let html = "<tr><th>Date</th><th>Student</th><th>Book</th><th>Type</th><th>Status</th></tr>";
+filtered.forEach(t => {
+let badge = t.status === 'Active' ? 'badge-yellow' : 'badge-green';
+html += `<tr><td>${t.date}</td><td>${t.student}</td><td>${t.book}</td><td>${t.type}</td><td><span class="badge ${badge}">${t.status}</span></td></tr>`;
+});
+document.getElementById("txTable").innerHTML = html;
+}
+ 
+// ============ USER ACTIONS ============
+function addUser(e){
+e.preventDefault();
+let name = document.getElementById("userName").value;
+let email = document.getElementById("userEmail").value;
+let role = document.getElementById("userRole").value;
+let dept = document.getElementById("userDept").value;
+users.push({name, email, role, dept, status:"Active"});
+renderUsers('all');
+e.target.reset();
+document.getElementById("addUserSuccess").style.display = "block";
+setTimeout(() => document.getElementById("addUserSuccess").style.display = "none", 2000);
+}
+ 
+function toggleUserStatus(index){
+users[index].status = users[index].status === 'Active' ? 'Suspended' : 'Active';
+renderUsers('all');
+}
+ 
+function deleteUser(index){
+if(confirm("Remove this user?")){
+users.splice(index, 1);
+renderUsers('all');
+}
+}
+ 
+function switchUserTab(el, filter){
+document.querySelectorAll("#users .tab").forEach(t => t.classList.remove("active"));
+el.classList.add("active");
+renderUsers(filter);
+}
+ 
+// ============ LIBRARIAN ACTIONS ============
+function addLibrarian(e){
+e.preventDefault();
+let name = document.getElementById("libName").value;
+let email = document.getElementById("libEmail").value;
+let empId = document.getElementById("libEmpId").value;
+let shift = document.getElementById("libShift").value;
+let phone = document.getElementById("libPhone").value || "N/A";
+librarians.push({name, email, empId, shift, phone, status:"Active"});
+renderLibrarians();
+e.target.reset();
+document.getElementById("libSuccess").style.display = "block";
+setTimeout(() => document.getElementById("libSuccess").style.display = "none", 2000);
+}
+ 
+function removeLibrarian(index){
+if(confirm("Remove this librarian?")){
+librarians.splice(index, 1);
+renderLibrarians();
+}
+}
+ 
+// ============ TRANSACTION TAB ============
+function switchTxTab(el, filter){
+document.querySelectorAll("#transactions .tab").forEach(t => t.classList.remove("active"));
+el.classList.add("active");
+renderTransactions(filter);
+}
+ 
+// ============ SEARCH ============
+function searchAdminBooks(){
+let input = document.getElementById("adminBookSearch").value.toUpperCase();
+let table = document.getElementById("adminBookTable");
+let tr = table.getElementsByTagName("tr");
+for(let i=1; i<tr.length; i++){
+let td1 = tr[i].getElementsByTagName("td")[0];
+let td2 = tr[i].getElementsByTagName("td")[1];
+let td3 = tr[i].getElementsByTagName("td")[2];
+let match = false;
+if(td1 && td1.innerHTML.toUpperCase().indexOf(input) > -1) match = true;
+if(td2 && td2.innerHTML.toUpperCase().indexOf(input) > -1) match = true;
+if(td3 && td3.innerHTML.toUpperCase().indexOf(input) > -1) match = true;
+tr[i].style.display = match ? "" : "none";
+}
+}
+ 
+function searchLogs(){
+let input = document.getElementById("logSearch").value.toUpperCase();
+let table = document.getElementById("logTable");
+let tr = table.getElementsByTagName("tr");
+for(let i=1; i<tr.length; i++){
+let td1 = tr[i].getElementsByTagName("td")[1];
+let td2 = tr[i].getElementsByTagName("td")[2];
+let match = false;
+if(td1 && td1.innerHTML.toUpperCase().indexOf(input) > -1) match = true;
+if(td2 && td2.innerHTML.toUpperCase().indexOf(input) > -1) match = true;
+tr[i].style.display = match ? "" : "none";
+}
+}
+ 
+// ============ SETTINGS ============
+function saveAdminSettings(e){
+e.preventDefault();
+document.getElementById("settingsSuccess").style.display = "block";
+setTimeout(() => document.getElementById("settingsSuccess").style.display = "none", 2000);
+}
+ 
+function backupSystem(){
+if(confirm("Start database backup?")){
+alert("✅ Database backup started successfully!");
+}
+}
+ 
+function clearCache(){
+if(confirm("Clear system cache?")){
+alert("✅ Cache cleared successfully!");
+}
+}
+ 
+function restartSystem(){
+if(confirm("⚠️ Are you sure you want to restart the system?")){
+alert("System is restarting... Please wait.");
+}
+}
+ 
+// ============ INIT ============
+renderUsers('all');
+renderLibrarians();
+renderAdminBooks();
+renderTransactions('all');
+</script>
+</body>
+</html>
+ 
