@@ -1,0 +1,251 @@
+
+
+Student dashboard · HTML
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Student Dashboard</title>
+<style>
+body{margin:0;font-family:Arial;background:#fafafa;color:#111}
+.sidebar{position:fixed;left:0;top:0;width:240px;height:100%;background:#000;color:#fff;padding:20px;overflow-y:auto;border-right:1px solid #000}
+.sidebar h2{margin:0 0 20px}
+.sidebar a{display:block;color:#fff;text-decoration:none;padding:10px;border-radius:6px;margin:6px 0;cursor:pointer;border:1px solid transparent}
+.sidebar a:hover{background:#fff;color:#000;border:1px solid #fff}
+.sidebar a.active{background:#fff;color:#000}
+.logout{border:1px solid #fff !important;margin-top:20px !important}
+.logout:hover{background:#fff;color:#000}
+.main{margin-left:260px;padding:20px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.card{background:#fff;padding:20px;border-radius:10px;border:1px solid #000}
+table{width:100%;border-collapse:collapse;background:#fff;margin-top:20px;border:1px solid #000}
+th,td{padding:12px;border-bottom:1px solid #ddd;text-align:left}
+th{background:#000;color:#fff}
+button{padding:8px 12px;border:1px solid #000;border-radius:6px;background:#000;color:#fff;cursor:pointer}
+button:hover{opacity:0.75}
+button:disabled{background:#fff;color:#999;border:1px solid #ccc;cursor:not-allowed}
+.reject{background:#fff;color:#000}
+.secondary{background:#fff;color:#000}
+input,select,textarea{padding:8px 12px;border:1px solid #000;border-radius:6px;font-size:14px;width:100%;box-sizing:border-box}
+form{background:#fff;padding:20px;border-radius:10px;border:1px solid #000;margin-top:20px}
+.form-group{margin-bottom:15px}
+.form-group label{display:block;font-weight:600;margin-bottom:5px;color:#000}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+h1{color:#000}
+h2{color:#000;margin-top:25px}
+.success-msg{background:#000;color:#fff;padding:10px;border-radius:6px;margin-bottom:10px;display:none}
+.error-msg{background:#fff;color:#000;border:1px solid #000;padding:10px;border-radius:6px;margin-bottom:10px;display:none}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.badge{display:inline-block;padding:3px 8px;border-radius:12px;font-size:12px;font-weight:600;border:1px solid #000}
+.badge-green{background:#000;color:#fff}
+.badge-red{background:#fff;color:#000}
+.badge-yellow{background:#eee;color:#000}
+.badge-blue{background:#fff;color:#000}
+.profile-card{background:#fff;padding:20px;border-radius:10px;border:1px solid #000;display:flex;gap:20px;align-items:center}
+.avatar{width:70px;height:70px;border-radius:50%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700}
+.book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px;margin-top:15px}
+.book-card{background:#fff;padding:15px;border-radius:10px;border:1px solid #000}
+.book-card h3{margin:0 0 5px;font-size:16px;color:#000}
+.book-card p{margin:2px 0;color:#555;font-size:13px}
+.notice{background:#eee;color:#000;border:1px solid #000;padding:12px;border-radius:6px;margin-bottom:15px}
+</style></head>
+<body>
+<div class="sidebar">
+<h2>🎓 Student</h2>
+<a onclick="showSection('dashboard')">🏠 Dashboard</a>
+<a onclick="showSection('browse')">🔍 Browse Catalog</a>
+<a onclick="showSection('mybooks')">📗 My Books</a>
+<a onclick="showSection('requests')">📋 My Requests</a>
+<a onclick="showSection('fines')">💰 Fines</a>
+<a onclick="showSection('profile')">👤 My Profile</a>
+<a href="login.html" class="logout">🚪 Logout</a>
+</div>
+ 
+<div class="main">
+ 
+<!-- ==================== DASHBOARD ==================== -->
+<div id="dashboard">
+<h1>Student Dashboard</h1>
+<p style="margin-top:-10px;color:#666">Welcome back, Praniti 👋</p>
+<div class="cards">
+<div class="card"><h3>Books Issued</h3><h1>2</h1></div>
+<div class="card"><h3>Pending Requests</h3><h1>1</h1></div>
+<div class="card"><h3>Due Soon</h3><h1>1</h1></div>
+<div class="card"><h3>Fine Due</h3><h1>₹0</h1></div>
+</div>
+ 
+<h2>Currently Issued</h2>
+<table>
+<tr><th>Book</th><th>Issued On</th><th>Due Date</th><th>Status</th><th>Action</th></tr>
+<tr><td>Java Programming</td><td>2024-01-10</td><td>2024-01-24</td><td><span class="badge badge-green">On Time</span></td><td><button onclick="showSection('mybooks')">View</button></td></tr>
+<tr><td>Data Structures</td><td>2024-01-05</td><td>2024-01-19</td><td><span class="badge badge-yellow">Due Soon</span></td><td><button onclick="showSection('mybooks')">View</button></td></tr>
+</table>
+</div>
+ 
+<!-- ==================== BROWSE CATALOG ==================== -->
+<div id="browse" style="display:none;">
+<div class="section-title"><h1>🔍 Browse Catalog</h1><span id="bookCount" style="color:#666;font-size:16px"></span></div>
+<div id="requestSuccess" class="success-msg">✅ Request sent to the librarian!</div>
+<input type="text" id="search" placeholder="Search by book name or author..." onkeyup="searchBook()" style="padding:10px;width:300px;margin-bottom:10px">
+<div class="book-grid" id="bookGrid"></div>
+</div>
+ 
+<!-- ==================== MY BOOKS ==================== -->
+<div id="mybooks" style="display:none;">
+<h1>📗 My Issued Books</h1>
+<table>
+<tr><th>Book</th><th>Author</th><th>Issued On</th><th>Due Date</th><th>Status</th><th>Action</th></tr>
+<tr><td>Java Programming</td><td>James Gosling</td><td>2024-01-10</td><td>2024-01-24</td><td><span class="badge badge-green">On Time</span></td><td><button onclick="renewBook(this)">Renew</button></td></tr>
+<tr><td>Data Structures</td><td>Mark Weiss</td><td>2024-01-05</td><td>2024-01-19</td><td><span class="badge badge-yellow">Due Soon</span></td><td><button onclick="renewBook(this)">Renew</button></td></tr>
+</table>
+<div id="renewSuccess" class="success-msg" style="margin-top:15px">✅ Book renewed for 14 more days!</div>
+</div>
+ 
+<!-- ==================== MY REQUESTS ==================== -->
+<div id="requests" style="display:none;">
+<h1>📋 My Borrow Requests</h1>
+<table id="requestTable">
+<tr><th>Book</th><th>Request Date</th><th>Status</th><th>Action</th></tr>
+<tr><td>DBMS</td><td>2024-01-15</td><td><span class="badge badge-yellow">Pending</span></td><td><button class="reject" onclick="cancelRequest(this)">Cancel</button></td></tr>
+<tr><td>Operating Systems</td><td>2024-01-10</td><td><span class="badge badge-green">Approved</span></td><td>-</td></tr>
+<tr><td>Python Basics</td><td>2024-01-08</td><td><span class="badge badge-red">Rejected</span></td><td>-</td></tr>
+</table>
+</div>
+ 
+<!-- ==================== FINES ==================== -->
+<div id="fines" style="display:none;">
+<h1>💰 Fines & Payments</h1>
+<div class="notice">Fine is charged at ₹5/day for every book returned after its due date.</div>
+<table>
+<tr><th>Book</th><th>Due Date</th><th>Returned On</th><th>Days Late</th><th>Fine</th><th>Status</th></tr>
+<tr><td>Python Basics</td><td>2023-12-19</td><td>2023-12-27</td><td>8</td><td>₹40</td><td><span class="badge badge-red">Unpaid</span></td></tr>
+<tr><td>Networking Basics</td><td>2023-11-10</td><td>2023-11-12</td><td>2</td><td>₹10</td><td><span class="badge badge-green">Paid</span></td></tr>
+</table>
+<h2>Total Outstanding: ₹40</h2>
+<button onclick="payFine()" style="padding:12px 24px;font-size:16px">💳 Pay Now</button>
+<div id="fineSuccess" class="success-msg" style="margin-top:15px">✅ Fine paid successfully!</div>
+</div>
+ 
+<!-- ==================== PROFILE ==================== -->
+<div id="profile" style="display:none;">
+<h1>👤 My Profile</h1>
+<div class="profile-card">
+<div class="avatar">PS</div>
+<div>
+<h2 style="margin:0">Praniti Shinde</h2>
+<p style="margin:4px 0;color:#666">Roll No: CS101 &nbsp;|&nbsp; Computer Science</p>
+<p style="margin:4px 0;color:#666">praniti@college.edu</p>
+</div>
+</div>
+<form onsubmit="updateProfile(event)">
+<div id="profileSuccess" class="success-msg">✅ Profile updated successfully!</div>
+<div class="form-row">
+<div class="form-group"><label>Full Name</label><input type="text" id="profName" value="Praniti Shinde" required></div>
+<div class="form-group"><label>Email</label><input type="email" id="profEmail" value="praniti@college.edu" required></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Phone</label><input type="text" id="profPhone" value="9876543210"></div>
+<div class="form-group"><label>Department</label>
+<select id="profDept">
+<option>Computer Science</option>
+<option>Electronics</option>
+<option>Mechanical</option>
+</select></div>
+</div>
+<button type="submit" style="padding:12px 24px;font-size:16px">💾 Save Changes</button>
+</form>
+</div>
+ 
+</div>
+ 
+<script>
+// ============ NAVIGATION ============
+function hideAll(){
+const sections = ["dashboard","browse","mybooks","requests","fines","profile"];
+sections.forEach(id => {
+let el = document.getElementById(id);
+if(el) el.style.display = "none";
+});
+}
+ 
+function showSection(id){
+hideAll();
+let el = document.getElementById(id);
+if(el) el.style.display = "block";
+}
+ 
+// ============ CATALOG DATA ============
+let books = [
+{name:"Java Programming", author:"James Gosling", category:"Programming", available:8},
+{name:"DBMS", author:"Korth", category:"Database", available:4},
+{name:"Python Basics", author:"Guido Rossum", category:"Programming", available:0},
+{name:"Data Structures", author:"Mark Weiss", category:"Programming", available:2},
+{name:"Operating Systems", author:"Tanenbaum", category:"Networking", available:6},
+{name:"Discrete Mathematics", author:"Rosen", category:"Mathematics", available:5}
+];
+ 
+function renderBooks(){
+const grid = document.getElementById("bookGrid");
+if(!grid) return;
+let html = "";
+books.forEach((b, i) => {
+let statusBadge = b.available > 0
+? `<span class="badge badge-green">${b.available} available</span>`
+: `<span class="badge badge-red">Out of stock</span>`;
+html += `<div class="book-card">
+<h3>${b.name}</h3>
+<p>by ${b.author}</p>
+<p>${b.category}</p>
+<p>${statusBadge}</p>
+<button style="margin-top:10px;width:100%" ${b.available === 0 ? "disabled" : ""} onclick="requestBook(${i})">${b.available === 0 ? "Unavailable" : "Request to Borrow"}</button>
+</div>`;
+});
+grid.innerHTML = html;
+document.getElementById("bookCount").textContent = `(${books.length} books)`;
+}
+ 
+renderBooks();
+ 
+function searchBook(){
+let input = document.getElementById("search").value.toUpperCase();
+let cards = document.querySelectorAll("#bookGrid .book-card");
+cards.forEach(card => {
+let match = card.innerText.toUpperCase().indexOf(input) > -1;
+card.style.display = match ? "" : "none";
+});
+}
+ 
+function requestBook(index){
+document.getElementById("requestSuccess").style.display = "block";
+setTimeout(() => document.getElementById("requestSuccess").style.display = "none", 2000);
+}
+ 
+// ============ MY BOOKS ============
+function renewBook(btn){
+let row = btn.parentElement.parentElement;
+row.cells[3].textContent = "2024-02-07";
+document.getElementById("renewSuccess").style.display = "block";
+setTimeout(() => document.getElementById("renewSuccess").style.display = "none", 2000);
+}
+ 
+// ============ REQUESTS ============
+function cancelRequest(btn){
+if(confirm("Cancel this request?")){
+btn.parentElement.parentElement.cells[2].innerHTML = '<span class="badge badge-red">Cancelled</span>';
+btn.parentElement.innerHTML = '-';
+}
+}
+ 
+// ============ FINES ============
+function payFine(){
+document.getElementById("fineSuccess").style.display = "block";
+setTimeout(() => document.getElementById("fineSuccess").style.display = "none", 2000);
+}
+ 
+// ============ PROFILE ============
+function updateProfile(e){
+e.preventDefault();
+document.getElementById("profileSuccess").style.display = "block";
+setTimeout(() => document.getElementById("profileSuccess").style.display = "none", 2000);
+}
+</script>
+</body>
+</html>
+ 

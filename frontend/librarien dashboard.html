@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Librarian Dashboard</title>
+<style>
+body{margin:0;font-family:Arial;background:#f4f6f9}
+.sidebar{position:fixed;left:0;top:0;width:240px;height:100%;background:#1f3d2e;color:#fff;padding:20px}
+.sidebar h2{margin:0 0 20px}
+.sidebar a{display:block;color:#fff;text-decoration:none;padding:10px;border-radius:6px;margin:6px 0}
+.sidebar a:hover{background:#2d5a45}
+.logout{background:#c0392b}
+.main{margin-left:260px;padding:20px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.card{background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+table{width:100%;border-collapse:collapse;background:#fff;margin-top:20px}
+th,td{padding:12px;border-bottom:1px solid #ddd;text-align:left}
+button{padding:8px 12px;border:none;border-radius:6px;background:#1f3d2e;color:#fff}
+.reject{background:#c0392b}
+</style></head>
+<body>
+<div class="sidebar">
+<h2>📚 Librarian</h2>
+
+<a href="#" onclick="showSection('dashboard')">🏠 Dashboard</a>
+
+<a href="#" onclick="showSection('books')">📚 Manage Books</a>
+
+<a href="#" onclick="showSection('addbook')">➕ Add Book</a>
+
+<a href="#" onclick="showSection('issue')">📖 Issue Books</a>
+
+<a href="#" onclick="showSection('return')">📥 Return Books</a>
+
+<a href="#" onclick="showSection('students')">👨‍🎓 Students</a>
+
+<a href="#" onclick="showSection('requests')">📋 Requests</a>
+
+<a href="#" onclick="showSection('overdue')">⏰ Overdue</a>
+
+<a href="#" onclick="showSection('reports')">📊 Reports</a>
+
+<a href="#" onclick="showSection('settings')">⚙ Settings</a>
+
+<a href="login.html" class="logout">🚪 Logout</a>
+
+</div>
+<div class="main">
+
+<div id="dashboard">
+
+<h1>Librarian Dashboard</h1>
+
+<div class="cards">
+<div class="card"><h3>Total Books</h3><h1>5200</h1></div>
+<div class="card"><h3>Students</h3><h1>1240</h1></div>
+<div class="card"><h3>Issued</h3><h1>210</h1></div>
+<div class="card"><h3>Pending</h3><h1>18</h1></div>
+</div>
+
+<h2>Pending Requests</h2>
+
+<table>
+<tr>
+<th>Student</th>
+<th>Book</th>
+<th>Action</th>
+</tr>
+
+<tr>
+<td>Praniti Shinde</td>
+<td>Java Programming</td>
+<td>
+<button>Approve</button>
+<button class="reject">Reject</button>
+</td>
+</tr>
+
+<tr>
+<td>Rahul Patil</td>
+<td>DBMS</td>
+<td>
+<button>Approve</button>
+<button class="reject">Reject</button>
+</td>
+</tr>
+</table>
+
+</div>
+
+<div id="books" style="display:none;">
+
+<h1>Manage Books</h1>
+
+<input
+type="text"
+id="search"
+placeholder="Search Book"
+onkeyup="searchBook()"
+style="padding:10px;width:300px;">
+
+<br><br>
+
+<table id="bookTable">
+
+<tr>
+<th>Book</th>
+<th>Author</th>
+<th>Quantity</th>
+<th>Action</th>
+</tr>
+
+<tr>
+<td>Java Programming</td>
+<td>James Gosling</td>
+<td>10</td>
+<td>
+<button onclick="editBook(this)">Edit</button>
+<button class="reject" onclick="deleteBook(this)">Delete</button>
+</td>
+</tr>
+
+<tr>
+<td>DBMS</td>
+<td>Korth</td>
+<td>5</td>
+<td>
+<button onclick="editBook(this)">Edit</button>
+<button class="reject" onclick="deleteBook(this)">Delete</button>
+</td>
+</tr>
+
+</table>
+
+</div>
+
+<div id="addbook" style="display:none;"></div>
+
+<div id="issue" style="display:none;"></div>
+
+<div id="return" style="display:none;"></div>
+
+<div id="students" style="display:none;"></div>
+
+<div id="requests" style="display:none;"></div>
+
+<div id="overdue" style="display:none;"></div>
+
+<div id="reports" style="display:none;"></div>
+
+<div id="settings" style="display:none;"></div>
+
+
+<script>
+function hideAll(){
+document.getElementById("dashboard").style.display="none";
+document.getElementById("books").style.display="none";
+}
+
+function showSection(id){
+hideAll();
+document.getElementById(id).style.display="block";
+}
+
+function deleteBook(btn){
+if(confirm("Delete Book?")){
+btn.parentElement.parentElement.remove();
+}
+}
+
+function editBook(btn){
+let row=btn.parentElement.parentElement;
+let book=prompt("Book Name",row.cells[0].innerHTML);
+let qty=prompt("Quantity",row.cells[2].innerHTML);
+
+if(book!=null){
+row.cells[0].innerHTML=book;
+row.cells[2].innerHTML=qty;
+}
+}
+
+function searchBook(){
+let input=document.getElementById("search").value.toUpperCase();
+let tr=document.getElementById("bookTable").getElementsByTagName("tr");
+
+for(let i=1;i<tr.length;i++){
+let td=tr[i].getElementsByTagName("td")[0];
+
+if(td){
+tr[i].style.display=td.innerHTML.toUpperCase().indexOf(input)>-1?"":"none";
+}
+}
+}
+</script>
+
+</body>
+</html>
