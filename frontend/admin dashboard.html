@@ -1,51 +1,71 @@
-
-
 Admin dashboard · HTML
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>Admin Dashboard</title>
 <style>
-body{margin:0;font-family:Arial;background:#f2f2f2;color:#000}
-.sidebar{position:fixed;left:0;top:0;width:240px;height:100%;background:#000;color:#fff;padding:20px;overflow-y:auto}
-.sidebar h2{margin:0 0 20px}
-.sidebar a{display:block;color:#fff;text-decoration:none;padding:10px;border-radius:6px;margin:6px 0;cursor:pointer}
-.sidebar a:hover{background:#333}
-.logout{background:#000;border:1px solid #fff;margin-top:20px !important}
+body{margin:0;font-family:Arial;background:linear-gradient(135deg,#dbe9ff 0%,#eef4ff 40%,#f5f9ff 100%);color:#000}
+.sidebar{position:fixed;left:0;top:0;width:240px;height:100%;background:#ffffff;color:#000;padding:20px;overflow-y:auto;border-right:1px solid #dbe7ff;box-shadow:2px 0 12px rgba(30,94,255,0.12)}
+.sidebar h2{margin:0 0 20px;color:#1e5eff}
+.sidebar a{display:block;color:#1e5eff;text-decoration:none;padding:10px;border-radius:6px;margin:6px 0;cursor:pointer;border:1px solid transparent}
+.sidebar a:hover{background:#eaf2ff;color:#1e5eff;border-color:#cfe0ff}
+.sidebar a.active{background:#1e5eff;color:#fff}
+.logout{border:1px solid #1e5eff !important;margin-top:20px !important;background:#fff !important;color:#1e5eff !important}
+.logout:hover{background:#1e5eff !important;color:#fff !important}
 .main{margin-left:260px;padding:20px}
+.chat-box{position:absolute;left:20px;right:20px;bottom:20px;background:#f7faff;border:1px solid #cfe0ff;border-radius:10px;padding:12px;box-shadow:0 2px 10px rgba(30,94,255,0.12)}
+.chat-box h3{margin:0 0 8px;font-size:14px;color:#000}
+.chat-box input{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid #cfe0ff;border-radius:6px;font-size:12px;background:#fff;color:#000;margin-bottom:8px;outline:none}
+.chat-box input:focus{border-color:#1e5eff}
+.chat-box button{width:100%;padding:8px;border:none;border-radius:6px;background:#1e5eff;color:#fff;font-size:12px;cursor:pointer}
+.chat-box button:hover{background:#0f46d6}
+.chat-msg{font-size:11px;color:#000;margin-top:6px;line-height:1.4;word-break:break-word}
 .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
-.card{background:#fff;padding:20px;border-radius:10px;border:1px solid #000;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-table{width:100%;border-collapse:collapse;background:#fff;margin-top:20px;border:1px solid #000}
-th,td{padding:12px;border-bottom:1px solid #ccc;text-align:left}
-th{background:#000;color:#fff}
-button{padding:8px 12px;border:1px solid #000;border-radius:6px;background:#000;color:#fff;cursor:pointer}
-button:hover{opacity:0.8}
-.reject{background:#fff;color:#000;border:1px solid #000}
-input,select,textarea{padding:8px 12px;border:1px solid #000;border-radius:6px;font-size:14px;width:100%;box-sizing:border-box}
-form{background:#fff;padding:20px;border-radius:10px;border:1px solid #000;box-shadow:0 2px 8px rgba(0,0,0,.15);margin-top:20px}
+.card{background:#ffffff;color:#000;padding:20px;border-radius:10px;border:1px solid #dbe7ff;box-shadow:0 2px 12px rgba(30,94,255,0.12)}
+.card h3,.card h1,.card p{color:#000}
+.card h1{font-size:2rem;line-height:1.2;margin:8px 0 0;color:#000}
+table{width:100%;border-collapse:collapse;background:#ffffff;color:#000;margin-top:20px;border:1px solid #dbe7ff;box-shadow:0 2px 10px rgba(30,94,255,0.1)}
+th,td{padding:12px;border-bottom:1px solid #e3edff;text-align:left;border-right:1px solid #e3edff}
+th{background:#1e5eff;color:#fff}
+button{padding:8px 12px;border:none;border-radius:6px;background:#1e5eff;color:#fff;cursor:pointer}
+button:hover{background:#0f46d6}
+.reject{background:#ff6b6b}
+input,select,textarea{padding:8px 12px;border:1px solid #cfe0ff;border-radius:6px;font-size:14px;width:100%;box-sizing:border-box;background:#f7faff;color:#000}
+form{background:#ffffff;color:#000;padding:20px;border-radius:10px;border:1px solid #dbe7ff;box-shadow:0 2px 10px rgba(30,94,255,0.1);margin-top:20px}
 .form-group{margin-bottom:15px}
 .form-group label{display:block;font-weight:600;margin-bottom:5px;color:#000}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-h1{color:#000}
-h2{color:#000;margin-top:25px}
-.success-msg{background:#fff;color:#000;border:1px solid #000;padding:10px;border-radius:6px;margin-bottom:10px;display:none}
-.error-msg{background:#fff;color:#000;border:1px solid #000;padding:10px;border-radius:6px;margin-bottom:10px;display:none}
+h1{color:#1e5eff;text-align:center}
+h2{color:#1e5eff;margin-top:25px}
+#dashboard h1, #dashboard p, #users h1, #librarians h1, #books h1, #transactions h1, #reports h1, #logs h1, #settings h1, #profile h1 {text-align:center}
+.success-msg{background:#1e5eff;color:#fff;padding:10px;border-radius:6px;margin-bottom:10px;display:none}
+.error-msg{background:#fff;color:#1e5eff;border:1px solid #1e5eff;padding:10px;border-radius:6px;margin-bottom:10px;display:none}
 .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.badge{display:inline-block;padding:3px 8px;border-radius:12px;font-size:12px;font-weight:600;border:1px solid #000}
-.badge-green{background:#000;color:#fff}
-.badge-red{background:#fff;color:#000}
-.badge-yellow{background:#ccc;color:#000}
-.badge-blue{background:#666;color:#fff}
-.stat-bar{background:#e0e0e0;height:20px;border-radius:10px;overflow:hidden;margin:8px 0;border:1px solid #000}
-.stat-bar-fill{height:100%;background:#000;border-radius:10px;color:#fff;font-size:11px;line-height:20px;padding-left:8px;text-align:center}
-.tabs{display:flex;gap:0;margin-bottom:20px;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #000;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-.tab{padding:12px 20px;cursor:pointer;font-weight:600;border-bottom:3px solid transparent;transition:all 0.2s}
-.tab:hover{background:#eee}
-.tab.active{background:#000;color:#fff}
-.panel{background:#fff;border-radius:10px;padding:20px;border:1px solid #000;box-shadow:0 2px 8px rgba(0,0,0,.15);margin-bottom:20px}
-.panel h3{margin-top:0}
-</style></head>
+.section-title h1{color:#1e5eff}
+.admin-search-wrap{width:100%;margin:10px 0 15px}
+.admin-search-wrap input{display:block;width:100%;max-width:100%;box-sizing:border-box;padding:12px 14px;border:2px solid #cfe0ff;border-radius:10px;font-size:15px;text-align:left;background:#f7faff;color:#000;outline:none}
+.admin-search-wrap input:focus{border-color:#1e5eff;box-shadow:0 0 0 3px rgba(30,94,255,.08)}
+#adminBookTable{border:2px solid #dbe7ff;border-collapse:collapse;width:100%;margin-top:10px;box-shadow:0 2px 10px rgba(30,94,255,0.1)}
+#adminBookTable th,#adminBookTable td{border:1px solid #e3edff;padding:12px;text-align:left;vertical-align:middle}
+#adminBookTable th{background:#1e5eff;color:#fff}
+#adminBookTable tr:hover{background:#eaf2ff}
+.badge{display:inline-block;padding:3px 8px;border-radius:12px;font-size:12px;font-weight:600;border:1px solid transparent}
+.badge-green{background:#e8f7ee;color:#1e8e3e;border-color:#b8e6c8}
+.badge-red{background:#ffecec;color:#d93025;border-color:#ffc9c9}
+.badge-yellow{background:#fff6e0;color:#b8860b;border-color:#ffe6a8}
+.badge-blue{background:#e8f0ff;color:#1e5eff;border-color:#cfe0ff}
+.stat-bar{background:#e6eefc;height:20px;border-radius:10px;overflow:hidden;margin:8px 0;border:1px solid #cfe0ff}
+.stat-bar-fill{height:100%;background:#1e5eff;border-radius:10px;color:#fff;font-size:11px;line-height:20px;padding-left:8px;text-align:center}
+.tabs{display:flex;gap:0;margin-bottom:20px;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #dbe7ff;box-shadow:0 2px 10px rgba(30,94,255,0.1)}
+.tab{padding:12px 20px;cursor:pointer;font-weight:600;border-bottom:3px solid transparent;transition:all 0.2s;color:#1e5eff}
+.tab:hover{background:#eaf2ff}
+.tab.active{background:#1e5eff;color:#fff}
+.panel{background:#ffffff;color:#000;border-radius:10px;padding:20px;border:1px solid #dbe7ff;box-shadow:0 2px 10px rgba(30,94,255,0.1);margin-bottom:20px}
+.panel h3{margin-top:0;color:#1e5eff}
+.book-title-cell{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.book-thumb{width:42px;height:56px;object-fit:cover;border-radius:7px;border:1px solid #dbe7ff;box-shadow:0 2px 6px rgba(30,94,255,0.12)}
+</style>
 <body>
 <div class="sidebar">
-<h2>🛡️ Admin</h2>
+<h2>🏛️ Admin</h2>
 <a onclick="showSection('dashboard')">🏠 Dashboard</a>
 <a onclick="showSection('users')">👥 Manage Users</a>
 <a onclick="showSection('librarians')">👩‍💼 Manage Librarians</a>
@@ -55,6 +75,12 @@ h2{color:#000;margin-top:25px}
 <a onclick="showSection('logs')">📜 Activity Logs</a>
 <a onclick="showSection('settings')">⚙ Settings</a>
 <a href="login.html" class="logout">🚪 Logout</a>
+<div class="chat-box">
+<h3>💬 Ask Anything</h3>
+<input type="text" id="chatInput" placeholder="Type your question here..." onkeydown="if(event.key==='Enter')chatSearch()">
+<button type="button" onclick="chatSearch()">🔍 Search on Google</button>
+<div class="chat-msg" id="chatMsg"></div>
+</div>
 </div>
  
 <div class="main">
@@ -63,16 +89,16 @@ h2{color:#000;margin-top:25px}
 <div id="dashboard">
 <h1>Admin Dashboard</h1>
 <div class="cards">
-<div class="card"><h3>Total Users</h3><h1 id="totalUsers">1,250</h1></div>
-<div class="card"><h3>Total Books</h3><h1 id="totalBooks">5,200</h1></div>
-<div class="card"><h3>Issued Books</h3><h1 id="totalIssued">210</h1></div>
-<div class="card"><h3>Pending Fines</h3><h1 id="totalFines">₹535</h1></div>
+<div class="card"><h3>Total Users</h3><h1 id="totalUsers">9</h1></div>
+<div class="card"><h3>Total Books</h3><h1 id="totalBooks">7</h1></div>
+<div class="card"><h3>Issued Books</h3><h1 id="totalIssued">17</h1></div>
+<div class="card"><h3>Pending Fines</h3><h1 id="totalFines">₹40</h1></div>
 </div>
 <div class="cards" style="margin-top:15px">
-<div class="card"><h3>Students</h3><h1>1,240</h1></div>
+<div class="card"><h3>Students</h3><h1>6</h1></div>
 <div class="card"><h3>Librarians</h3><h1 id="libCount">4</h1></div>
-<div class="card"><h3>Overdue Books</h3><h1>12</h1></div>
-<div class="card"><h3>Today's Issues</h3><h1>8</h1></div>
+<div class="card"><h3>Overdue Books</h3><h1>2</h1></div>
+<div class="card"><h3>Today's Issues</h3><h1>2</h1></div>
 </div>
  
 <h2>Quick Actions</h2>
@@ -177,7 +203,9 @@ h2{color:#000;margin-top:25px}
 <!-- ==================== ALL BOOKS ==================== -->
 <div id="books" style="display:none;">
 <div class="section-title"><h1>📚 All Books in Library</h1><span id="allBookCount" style="color:#333;font-size:16px"></span></div>
-<input type="text" id="adminBookSearch" placeholder="Search by title, author or ISBN..." onkeyup="searchAdminBooks()" style="padding:10px;width:300px;margin-bottom:10px">
+<div class="admin-search-wrap">
+<input type="text" id="adminBookSearch" placeholder="Search by title, author or ISBN..." onkeyup="searchAdminBooks()">
+</div>
 <table id="adminBookTable">
 <tr><th>Book</th><th>Author</th><th>ISBN</th><th>Category</th><th>Total Qty</th><th>Available</th><th>Issued</th></tr>
 </table>
@@ -266,9 +294,9 @@ h2{color:#000;margin-top:25px}
  
 <div class="panel">
 <h3>System Maintenance</h3>
-<button onclick="backupSystem()" style="background:#000;padding:12px 20px;margin-right:10px">💾 Backup Database</button>
-<button onclick="clearCache()" style="background:#444;padding:12px 20px;margin-right:10px">🧹 Clear Cache</button>
-<button onclick="restartSystem()" style="background:#fff;color:#000;border:1px solid #000;padding:12px 20px">🔄 Restart System</button>
+<button onclick="backupSystem()" style="background:#1e5eff;padding:12px 20px;margin-right:10px">💾 Backup Database</button>
+<button onclick="clearCache()" style="background:#3b82f6;padding:12px 20px;margin-right:10px">🧹 Clear Cache</button>
+<button onclick="restartSystem()" style="background:#fff;color:#1e5eff;border:1px solid #1e5eff;padding:12px 20px">🔄 Restart System</button>
 </div>
  
 </div>
@@ -310,13 +338,13 @@ let librarians = [
 ];
  
 let books = [
-{name:"Java Programming", author:"James Gosling", isbn:"978-0-13-468599-1", cat:"Programming", total:10, avail:6, issued:4},
-{name:"DBMS", author:"Korth", isbn:"978-0-07-120413-8", cat:"Database", total:5, avail:3, issued:2},
-{name:"Python Basics", author:"Guido Rossum", isbn:"978-1-49-195766-8", cat:"Programming", total:8, avail:5, issued:3},
-{name:"Data Structures", author:"Mark Weiss", isbn:"978-0-13-284737-7", cat:"Programming", total:3, avail:0, issued:3},
-{name:"Operating Systems", author:"Tanenbaum", isbn:"978-0-13-359162-0", cat:"Networking", total:6, avail:4, issued:2},
-{name:"Computer Networks", author:"Kurose", isbn:"978-0-13-676354-5", cat:"Networking", total:4, avail:3, issued:1},
-{name:"Discrete Mathematics", author:"Rosen", isbn:"978-0-07-338309-5", cat:"Mathematics", total:7, avail:5, issued:2}
+{name:"Java Programming", author:"James Gosling", isbn:"978-0-13-468599-1", cat:"Programming", total:10, avail:6, issued:4, image:"https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=300&q=80"},
+{name:"DBMS", author:"Korth", isbn:"978-0-07-120413-8", cat:"Database", total:5, avail:3, issued:2, image:"https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=300&q=80"},
+{name:"Python Basics", author:"Guido Rossum", isbn:"978-1-49-195766-8", cat:"Programming", total:8, avail:5, issued:3, image:"https://images.unsplash.com/photo-1528712306091-ed0763094c98?auto=format&fit=crop&w=300&q=80"},
+{name:"Data Structures", author:"Mark Weiss", isbn:"978-0-13-284737-7", cat:"Programming", total:3, avail:0, issued:3, image:"https://images.unsplash.com/photo-1524578271613-d550eacf6090?auto=format&fit=crop&w=300&q=80"},
+{name:"Operating Systems", author:"Tanenbaum", isbn:"978-0-13-359162-0", cat:"Networking", total:6, avail:4, issued:2, image:"https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=300&q=80"},
+{name:"Computer Networks", author:"Kurose", isbn:"978-0-13-676354-5", cat:"Networking", total:4, avail:3, issued:1, image:"https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=300&q=80"},
+{name:"Discrete Mathematics", author:"Rosen", isbn:"978-0-07-338309-5", cat:"Mathematics", total:7, avail:5, issued:2, image:"https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=300&q=80"}
 ];
  
 let transactions = [
@@ -366,7 +394,7 @@ function renderAdminBooks(){
 let html = "<tr><th>Book</th><th>Author</th><th>ISBN</th><th>Category</th><th>Total Qty</th><th>Available</th><th>Issued</th></tr>";
 books.forEach(b => {
 html += `<tr>
-<td>${b.name}</td><td>${b.author}</td><td>${b.isbn}</td><td>${b.cat}</td>
+<td class="book-title-cell"><img class="book-thumb" src="${b.image}" alt="${b.name}"><span>${b.name}</span></td><td>${b.author}</td><td>${b.isbn}</td><td>${b.cat}</td>
 <td>${b.total}</td><td>${b.avail}</td><td>${b.issued}</td>
 </tr>`;
 });
@@ -504,6 +532,20 @@ alert("System is restarting... Please wait.");
 }
 }
  
+// ============ CHAT BOX (GOOGLE SEARCH) ============
+function chatSearch(){
+const input = document.getElementById("chatInput");
+const msg = document.getElementById("chatMsg");
+const query = input.value.trim();
+if(query === ""){
+msg.textContent = "⚠️ Please type a question first.";
+return;
+}
+msg.textContent = "🔎 Opening Google search for your question...";
+window.open("https://www.google.com/search?q=" + encodeURIComponent(query), "_blank");
+input.value = "";
+}
+
 // ============ INIT ============
 renderUsers('all');
 renderLibrarians();

@@ -1,23 +1,40 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>Librarian Dashboard</title>
 <style>
-body{margin:0;font-family:Arial;background:#f4f6f9}
-.sidebar{position:fixed;left:0;top:0;width:240px;height:100%;background:#1f3d2e;color:#fff;padding:20px}
-.sidebar h2{margin:0 0 20px}
-.sidebar a{display:block;color:#fff;text-decoration:none;padding:10px;border-radius:6px;margin:6px 0}
-.sidebar a:hover{background:#2d5a45}
-.logout{background:#c0392b}
+body{margin:0;font-family:Arial;background:linear-gradient(135deg,#dbe9ff 0%,#eef4ff 40%,#f5f9ff 100%);color:#000}
+.sidebar{position:fixed;left:0;top:0;width:240px;height:100%;background:#ffffff;color:#000;padding:20px;box-sizing:border-box;overflow-y:auto;border-right:1px solid #dbe7ff;box-shadow:2px 0 12px rgba(30,94,255,0.12)}
+.sidebar h2{margin:0 0 20px;letter-spacing:1px;color:#000}
+.sidebar a{display:block;color:#000;text-decoration:none;padding:10px;border-radius:6px;margin:6px 0;transition:0.2s ease;border:1px solid transparent}
+.sidebar a:hover{background:#eaf2ff;color:#000;border-color:#cfe0ff;transform:translateX(2px)}
+.logout{background:#fff;border:1px solid #1e5eff;color:#000}
+.logout:hover{background:#1e5eff;color:#fff}
 .main{margin-left:260px;padding:20px}
+.chat-box{position:absolute;left:20px;right:20px;bottom:20px;background:#f7faff;border:1px solid #cfe0ff;border-radius:10px;padding:12px;box-shadow:0 2px 10px rgba(30,94,255,0.12)}
+.chat-box h3{margin:0 0 8px;font-size:14px;color:#000}
+.chat-box input{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid #cfe0ff;border-radius:6px;font-size:12px;background:#fff;color:#000;margin-bottom:8px;outline:none}
+.chat-box input:focus{border-color:#1e5eff}
+.chat-box button{width:100%;padding:8px;border:none;border-radius:6px;background:#1e5eff;color:#fff;font-size:12px;cursor:pointer}
+.chat-box button:hover{background:#0f46d6}
+.chat-msg{font-size:11px;color:#000;margin-top:6px;line-height:1.4;word-break:break-word}
 .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
-.card{background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-table{width:100%;border-collapse:collapse;background:#fff;margin-top:20px}
-th,td{padding:12px;border-bottom:1px solid #ddd;text-align:left}
-button{padding:8px 12px;border:none;border-radius:6px;background:#1f3d2e;color:#fff}
-.reject{background:#c0392b}
+.card{background:#ffffff;color:#000;padding:20px;border-radius:12px;box-shadow:0 2px 12px rgba(30,94,255,0.12);border:1px solid #dbe7ff}
+.card h3,.card h1,.card p{color:#000}
+.card h1{font-size:2rem;line-height:1.2;margin:8px 0 0;color:#000}
+table{width:100%;border-collapse:collapse;background:#ffffff;color:#000;margin-top:20px;border:1px solid #dbe7ff;box-shadow:0 2px 10px rgba(30,94,255,0.1)}
+th,td{padding:12px;border-bottom:1px solid #e3edff;text-align:left;border-right:1px solid #e3edff}
+th{background:#1e5eff;color:#fff}
+button{padding:8px 12px;border:none;border-radius:6px;background:#1e5eff;color:#fff;cursor:pointer;transition:0.2s ease}
+button:hover{background:#0f46d6}
+.reject{background:#ff6b6b}
+input{padding:10px 12px;border:1px solid #cfe0ff;border-radius:8px;width:100%;box-sizing:border-box;font-size:14px;outline:none;background:#f7faff;color:#000}
+input:focus{border-color:#1e5eff;box-shadow:0 0 0 3px rgba(30,94,255,.08)}
+h1{color:#000;margin:0 0 12px 0;text-align:center;letter-spacing:1px}
+h2{color:#000;margin-top:24px}
+#dashboard h1, #books h1, #addbook h1, #issue h1, #return h1, #students h1, #requests h1, #overdue h1, #reports h1, #settings h1 {text-align:center}
 </style></head>
 <body>
 <div class="sidebar">
-<h2>📚 Librarian</h2>
+<h2>� Librarian</h2>
 
 <a href="#" onclick="showSection('dashboard')">🏠 Dashboard</a>
 
@@ -41,6 +58,12 @@ button{padding:8px 12px;border:none;border-radius:6px;background:#1f3d2e;color:#
 
 <a href="login.html" class="logout">🚪 Logout</a>
 
+<div class="chat-box">
+<h3>💬 Ask Anything</h3>
+<input type="text" id="chatInput" placeholder="Type your question here..." onkeydown="if(event.key==='Enter')chatSearch()">
+<button type="button" onclick="chatSearch()">🔍 Search on Google</button>
+<div class="chat-msg" id="chatMsg"></div>
+</div>
 </div>
 <div class="main">
 
@@ -49,10 +72,10 @@ button{padding:8px 12px;border:none;border-radius:6px;background:#1f3d2e;color:#
 <h1>Librarian Dashboard</h1>
 
 <div class="cards">
-<div class="card"><h3>Total Books</h3><h1>5200</h1></div>
-<div class="card"><h3>Students</h3><h1>1240</h1></div>
-<div class="card"><h3>Issued</h3><h1>210</h1></div>
-<div class="card"><h3>Pending</h3><h1>18</h1></div>
+<div class="card"><h3>Total Books</h3><h1>7</h1></div>
+<div class="card"><h3>Students</h3><h1>6</h1></div>
+<div class="card"><h3>Issued</h3><h1>17</h1></div>
+<div class="card"><h3>Pending</h3><h1>2</h1></div>
 </div>
 
 <h2>Pending Requests</h2>
@@ -89,14 +112,9 @@ button{padding:8px 12px;border:none;border-radius:6px;background:#1f3d2e;color:#
 
 <h1>Manage Books</h1>
 
-<input
-type="text"
-id="search"
-placeholder="Search Book"
-onkeyup="searchBook()"
-style="padding:10px;width:300px;">
-
-<br><br>
+<div style="max-width:420px;margin:0 auto 15px;">
+<input type="text" id="search" placeholder="Search Book" onkeyup="searchBook()">
+</div>
 
 <table id="bookTable">
 
@@ -131,32 +149,127 @@ style="padding:10px;width:300px;">
 
 </div>
 
-<div id="addbook" style="display:none;"></div>
+<div id="addbook" style="display:none;">
+<h1>Add Book</h1>
+<div style="max-width:700px;margin:0 auto;background:rgba(255,255,255,0.95);border-radius:12px;padding:20px;color:#111;box-shadow:0 2px 8px rgba(0,0,0,.12);">
+  <form>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+      <div>
+        <label style="display:block;margin-bottom:8px;font-weight:bold;">Book Title</label>
+        <input type="text" value="The Pragmatic Programmer">
+      </div>
+      <div>
+        <label style="display:block;margin-bottom:8px;font-weight:bold;">Author</label>
+        <input type="text" value="Andrew Hunt">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:15px;">
+      <div>
+        <label style="display:block;margin-bottom:8px;font-weight:bold;">Category</label>
+        <input type="text" value="Programming">
+      </div>
+      <div>
+        <label style="display:block;margin-bottom:8px;font-weight:bold;">Quantity</label>
+        <input type="number" value="12">
+      </div>
+    </div>
+    <div style="margin-top:20px;">
+      <button type="button">Save Book</button>
+    </div>
+  </form>
+</div>
+</div>
 
-<div id="issue" style="display:none;"></div>
+<div id="issue" style="display:none;">
+<h1>Issue Books</h1>
+<table>
+  <tr><th>Student</th><th>Book</th><th>Issue Date</th><th>Due Date</th><th>Action</th></tr>
+  <tr><td>Praniti Shinde</td><td>Java Programming</td><td>2024-01-15</td><td>2024-01-29</td><td><button>Issue</button></td></tr>
+  <tr><td>Rahul Patil</td><td>DBMS</td><td>2024-01-15</td><td>2024-01-29</td><td><button>Issue</button></td></tr>
+</table>
+</div>
 
-<div id="return" style="display:none;"></div>
+<div id="return" style="display:none;">
+<h1>Return Books</h1>
+<table>
+  <tr><th>Student</th><th>Book</th><th>Issued On</th><th>Returned On</th><th>Status</th></tr>
+  <tr><td>Neha Patil</td><td>Python Basics</td><td>2024-01-01</td><td>2024-01-14</td><td><button class="reject">Returned</button></td></tr>
+  <tr><td>Rohit Jain</td><td>Operating Systems</td><td>2024-01-05</td><td>Pending</td><td><button>Mark Return</button></td></tr>
+</table>
+</div>
 
-<div id="students" style="display:none;"></div>
+<div id="students" style="display:none;">
+<h1>Students</h1>
+<table>
+  <tr><th>Name</th><th>Roll No</th><th>Department</th><th>Issued Books</th><th>Status</th></tr>
+  <tr><td>Praniti Shinde</td><td>CS101</td><td>Computer Science</td><td>2</td><td><button>Active</button></td></tr>
+  <tr><td>Rahul Patil</td><td>CS110</td><td>Computer Science</td><td>1</td><td><button>Active</button></td></tr>
+</table>
+</div>
 
-<div id="requests" style="display:none;"></div>
+<div id="requests" style="display:none;">
+<h1>Requests</h1>
+<table>
+  <tr><th>Student</th><th>Book</th><th>Request Date</th><th>Status</th><th>Action</th></tr>
+  <tr><td>Neha Patil</td><td>Web Development</td><td>2024-01-16</td><td>Pending</td><td><button>Approve</button></td></tr>
+  <tr><td>Sneha Joshi</td><td>Machine Learning</td><td>2024-01-16</td><td>Pending</td><td><button>Approve</button></td></tr>
+</table>
+</div>
 
-<div id="overdue" style="display:none;"></div>
+<div id="overdue" style="display:none;">
+<h1>Overdue Books</h1>
+<table>
+  <tr><th>Student</th><th>Book</th><th>Due Date</th><th>Days Late</th><th>Fine</th></tr>
+  <tr><td>Praniti Shinde</td><td>Machine Learning</td><td>2024-01-16</td><td>4</td><td>₹20</td></tr>
+  <tr><td>Rahul Patil</td><td>Computer Networks</td><td>2024-01-10</td><td>10</td><td>₹50</td></tr>
+</table>
+</div>
 
-<div id="reports" style="display:none;"></div>
+<div id="reports" style="display:none;">
+<h1>Reports</h1>
+<div class="cards">
+  <div class="card"><h3>Books Issued</h3><h1>17</h1></div>
+  <div class="card"><h3>Books Returned</h3><h1>6</h1></div>
+  <div class="card"><h3>Pending Requests</h3><h1>2</h1></div>
+  <div class="card"><h3>Overdue</h3><h1>2</h1></div>
+</div>
+</div>
 
-<div id="settings" style="display:none;"></div>
+<div id="settings" style="display:none;">
+<h1>Settings</h1>
+<div style="max-width:700px;margin:0 auto;background:rgba(255,255,255,0.95);border-radius:12px;padding:20px;color:#111;box-shadow:0 2px 8px rgba(0,0,0,.12);">
+  <form>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+      <div>
+        <label style="display:block;margin-bottom:8px;font-weight:bold;">Library Name</label>
+        <input type="text" value="Central Library">
+      </div>
+      <div>
+        <label style="display:block;margin-bottom:8px;font-weight:bold;">Fine Per Day</label>
+        <input type="number" value="5">
+      </div>
+    </div>
+    <div style="margin-top:20px;">
+      <button type="button">Save Settings</button>
+    </div>
+  </form>
+</div>
+</div>
 
 
 <script>
 function hideAll(){
-document.getElementById("dashboard").style.display="none";
-document.getElementById("books").style.display="none";
+const ids = ["dashboard","books","addbook","issue","return","students","requests","overdue","reports","settings"];
+ids.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.style.display = "none";
+});
 }
 
 function showSection(id){
 hideAll();
-document.getElementById(id).style.display="block";
+const el = document.getElementById(id);
+if (el) el.style.display = "block";
 }
 
 function deleteBook(btn){
@@ -187,6 +300,20 @@ if(td){
 tr[i].style.display=td.innerHTML.toUpperCase().indexOf(input)>-1?"":"none";
 }
 }
+}
+
+// ============ CHAT BOX (GOOGLE SEARCH) ============
+function chatSearch(){
+const input = document.getElementById("chatInput");
+const msg = document.getElementById("chatMsg");
+const query = input.value.trim();
+if(query === ""){
+msg.textContent = "⚠️ Please type a question first.";
+return;
+}
+msg.textContent = "🔎 Opening Google search for your question...";
+window.open("https://www.google.com/search?q=" + encodeURIComponent(query), "_blank");
+input.value = "";
 }
 </script>
 
