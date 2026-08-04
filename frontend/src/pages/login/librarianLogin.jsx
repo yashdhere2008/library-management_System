@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { useAuth } from "../../context/AuthContext";   // Adjust path if needed
+import API from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
 function LibrarianLogin() {
   const [email, setEmail] = useState("");
@@ -15,14 +15,15 @@ function LibrarianLogin() {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5005/api/auth/login", {
+      const response = await API.post("/api/auth/login", {
         email,
         password,
         role: "librarian"
       });
 
       if (response.data.success) {
-        login(response.data.user);           // ← Save user in context
+        localStorage.setItem("token", response.data.token);
+        login(response.data.user);
         alert("Librarian Login Successful!");
         navigate("/librarian-dashboard");
       }

@@ -1,30 +1,19 @@
 import mongoose from "mongoose";
 
+const connectDB = async () => {
+  try {
+    const uri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/library_management";
 
-const connectDB = async()=>{
+    await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 10000,
+    });
 
-
-try{
-
-
-await mongoose.connect(process.env.MONGO_URI);
-
-
-console.log("MongoDB Connected");
-
-
-}
-
-catch(error){
-
-console.log(error.message);
-
-process.exit(1);
-
-}
-
-
-}
-
+    console.log("MongoDB Connected");
+    return true;
+  } catch (error) {
+    console.error("MongoDB connection failed:", error.message);
+    return false;
+  }
+};
 
 export default connectDB;

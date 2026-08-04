@@ -1,89 +1,62 @@
-// LibraryPortal.jsx
 import React, { useState } from 'react';
-import './LibraryPortal.css'; // We'll create this CSS file below
+import { useNavigate } from 'react-router-dom';
+import './libraryportal.css';
 
 const LibraryPortal = () => {
   const [email, setEmail] = useState('');
-  const [activeTab, setActiveTab] = useState('email'); // email or password
+  const navigate = useNavigate();
 
   const handleLogin = (role) => {
     if (!email) {
-      alert('Please enter your email address');
+      alert('Please enter your college email address');
       return;
     }
-    console.log(`Logging in as ${role} with email: ${email}`);
-    // Add your actual login logic here
-    alert(`Welcome! ${role} Login initiated for ${email}`);
+
+    const roleKey = role === 'Admin' ? 'admin' : role === 'Librarian' ? 'librarian' : 'student';
+    navigate('/login', { state: { role: roleKey, email } });
   };
 
   return (
     <div className="library-portal">
-      {/* Background Bookshelf */}
       <div className="bookshelf-bg">
-        {/* Overlay Content Container */}
         <div className="content-container">
-          {/* Left Side - Text Content */}
           <div className="left-panel">
-            <div className="quick-tips">Quick Tips</div>
+            <div className="quick-tips">College Library • Digital Access</div>
             <h1 className="main-title">
-              Library<br />
-              Management<br />
-              Portal.
+              I Love Library
             </h1>
             <p className="description">
-              Our dedicated system streamlines book borrowing, requests, and comprehensive 
-              digital catalog access, ensuring a smooth user experience. All resources are 
-              organized and available in one place.
+              A modern campus library platform for students, librarians, and administrators to manage borrowing,
+              returns, catalog access, and academic resources in one seamless experience.
             </p>
+            <div className="feature-list">
+              <div>• Real-time issue and return tracking</div>
+              <div>• Smart catalog and search experience</div>
+              <div>• Role-based access for college staff and students</div>
+            </div>
           </div>
 
-          {/* Right Side - Login Card */}
           <div className="login-card">
-            {/* Tab Navigation */}
-            <div className="tabs">
-              <button 
-                className={`tab ${activeTab === 'email' ? 'active' : ''}`}
-                onClick={() => setActiveTab('email')}
-              >
-                Email
-              </button>
-              <button 
-                className={`tab ${activeTab === 'password' ? 'active' : ''}`}
-                onClick={() => setActiveTab('password')}
-              >
-                Password
-              </button>
-            </div>
-
-            {/* Email Input */}
+            <div className="card-badge">Secure College Access</div>
+            <h2 className="card-title">Choose your portal</h2>
             <div className="input-group">
-              <label>Your Email Address</label>
-              <input 
-                type="email" 
+              <label>Your College Email</label>
+              <input
+                type="email"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
-            {/* Login Buttons */}
             <div className="login-buttons">
-              <button 
-                className="btn btn-student"
-                onClick={() => handleLogin('Student')}
-              >
+              <button className="btn btn-student" onClick={() => handleLogin('Student')}>
                 Student Login
               </button>
-              <button 
-                className="btn btn-librarian"
-                onClick={() => handleLogin('Librarian')}
-              >
+              <button className="btn btn-librarian" onClick={() => handleLogin('Librarian')}>
                 Librarian Login
               </button>
-              <button 
-                className="btn btn-admin"
-                onClick={() => handleLogin('Admin')}
-              >
+              <button className="btn btn-admin" onClick={() => handleLogin('Admin')}>
                 Admin Login
               </button>
             </div>

@@ -1,14 +1,19 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./db.js";
 import authRoutes from "./Controller/authroutes.js";
 import bookRoutes from "./Controller/bookRoutes.js";
-dotenv.config();
 
-connectDB();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 const app = express();
+app.use(express.json());
 
 // ✅ Allow multiple frontend origins during development
 const allowedOrigins = [
@@ -39,8 +44,21 @@ app.get("/", (req, res) => {
   res.send("Library Management API Running");
 });
 
-const PORT = process.env.PORT || 5005;
+const startServer = async () => {
+  try {
+    const dbReady = await connectDB();
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+    const PORT = process.env.PORT || 5005;
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      if (!dbReady) {
+        console.warn("⚠️ MongoDB is not connected, but the server is running in fallback mode.");
+      }
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error.message);
+    process.exit(1);
+  }
+};
+
+startServer();

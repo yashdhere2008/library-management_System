@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { useAuth } from "../../context/AuthContext";   // Adjust path if needed
+import API from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
 function StudentLogin() {
   const [email, setEmail] = useState("");
@@ -15,14 +15,15 @@ function StudentLogin() {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5005/api/auth/login", {
+      const response = await API.post("/api/auth/login", {
         email,
         password,
         role: "student"
       });
 
       if (response.data.success) {
-        login(response.data.user);           // ← Save user data
+        localStorage.setItem("token", response.data.token);
+        login(response.data.user);
         alert("Student Login Successful!");
         navigate("/student-dashboard");
       }
