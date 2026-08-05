@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import { getDashboardPath } from "../../lib/roleRoutes";
 import "./login.css";
 
 const LoginPage = () => {
@@ -15,9 +16,9 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [retried, setRetried] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const submitLogin = async () => {
     setMessage("");
 
     if (!role || !email || !password) {
@@ -35,27 +36,37 @@ const LoginPage = () => {
       });
 
       if (response.data.success) {
-        setMessage(`✅ Login Successful as ${role}!`);
+        setMessage("✅ Login successfully");
         const userData = response.data.user;
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(userData));
         login(userData);
 
+        // Small delay to allow AuthContext to update before ProtectedRoute checks
         setTimeout(() => {
-          if (userData.role === "admin") {
-            navigate("/admin-dashboard");
-          } else if (userData.role === "librarian") {
-            navigate("/librarian-dashboard");
-          } else {
-            navigate("/student-dashboard");
-          }
-        }, 1000);
+          navigate(getDashboardPath(userData.role));
+        }, 50);
       }
     } catch (err) {
-      setMessage("⚠ " + (err.response?.data?.message || "Login failed. Please try again."));
+      const serverMsg = err.response?.data?.message || "Login failed. Please try again.";
+      setMessage("⚠ " + serverMsg);
+
+      // If server suggests the expected role, auto-select it and retry once
+      const expected = err.response?.data?.expectedRole;
+      if (expected && !retried) {
+        setRole(expected);
+        setRetried(true);
+        setTimeout(() => submitLogin(), 200);
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setRetried(false);
+    submitLogin();
   };
 
   const handleRegister = async (e) => {
@@ -101,7 +112,7 @@ const LoginPage = () => {
       <div className="login-box">
         {/* LOGIN */}
         <div className={`form ${mode === "login" ? "active" : ""}`}>
-          <h2>Welcome to the Library Management System</h2>
+          <h2>I ❤️ Library </h2>
           <p className="subtitle">Login to continue...</p>
 
           <div className="input-box">

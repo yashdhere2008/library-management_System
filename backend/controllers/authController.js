@@ -36,14 +36,58 @@ export const login = async (req, res) => {
 
     if (mongoose.connection.readyState === 1) {
       user = await User.findOne({ email: normalizedEmail, role });
-      if (!user && fallbackUsers[normalizedEmail]) {
-        user = fallbackUsers[normalizedEmail];
+
+      // If no user found for the selected role, check if the email exists with a different role
+      if (!user) {
+        const userByEmail = await User.findOne({ email: normalizedEmail });
+        if (userByEmail) {
+          return res.status(400).json({ message: `Please select role '${userByEmail.role}' to login`, expectedRole: userByEmail.role });
+        }
+        if (fallbackUsers[normalizedEmail]) {
+          user = fallbackUsers[normalizedEmail];
+        }
       }
     } else {
       user = fallbackUsers[normalizedEmail];
     }
 
     if (!user) {
+      // If configured for development, allow any email/password to login
+      const allowAny = process.env.DEV_AUTH_ALLOW_ANY === 'true' || process.env.NODE_ENV !== 'production';
+      if (allowAny) {
+        const tempId = `dev-${Math.random().toString(36).slice(2, 10)}`;
+        const tempRole = role || 'student';
+        const tempUser = {
+          _id: tempId,
+          name: 'Dev User',
+          email: normalizedEmail || email,
+          password: password,
+          role: tempRole,
+        };
+
+        // keep in-memory fallback so subsequent calls in this process behave consistently
+        fallbackUsers[normalizedEmail] = tempUser;
+
+        const token = jwt.sign(
+          { id: tempUser._id, role: tempUser.role },
+          process.env.JWT_SECRET || "dev-secret",
+          { expiresIn: "1d" }
+        );
+
+        return res.json({
+          success: true,
+          message: "Login successful (dev fallback)",
+          token,
+          user: {
+            id: tempUser._id,
+            name: tempUser.name,
+            email: tempUser.email,
+            role: tempUser.role,
+          },
+          devFallback: true,
+        });
+      }
+
       return res.status(400).json({ message: "User not found" });
     }
 
