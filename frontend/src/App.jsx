@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 
 import StudentDashboard from "./pages/Dashboard/studentdashboard.jsx";
-import LibrarianDashboard from "./pages/Dashboard/libratianDashboard.jsx";
+import LibrarianDashboard from "./pages/Dashboard/librarianDashboard.jsx";
 import AdminDashboard from "./pages/Dashboard/admindashboard.jsx";
 import LoginPage from "./pages/login/login.jsx";
 

@@ -9,12 +9,10 @@ const LoginPage = () => {
   const { login } = useAuth();
 
   const [mode, setMode] = useState("login");
-  const [role, setRole] = useState("student");
+  const [role, setRole] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -22,8 +20,8 @@ const LoginPage = () => {
     e.preventDefault();
     setMessage("");
 
-    if (!email || !password) {
-      setMessage("Please complete all login fields.");
+    if (!role || !email || !password) {
+      setMessage("⚠ Please fill all fields!");
       return;
     }
 
@@ -33,25 +31,28 @@ const LoginPage = () => {
       const response = await API.post("/api/auth/login", {
         email,
         password,
-        role,
+        role: role.toLowerCase(),
       });
 
       if (response.data.success) {
+        setMessage(`✅ Login Successful as ${role}!`);
         const userData = response.data.user;
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(userData));
         login(userData);
 
-        if (userData.role === "admin") {
-          navigate("/admin-dashboard");
-        } else if (userData.role === "librarian") {
-          navigate("/librarian-dashboard");
-        } else {
-          navigate("/student-dashboard");
-        }
+        setTimeout(() => {
+          if (userData.role === "admin") {
+            navigate("/admin-dashboard");
+          } else if (userData.role === "librarian") {
+            navigate("/librarian-dashboard");
+          } else {
+            navigate("/student-dashboard");
+          }
+        }, 1000);
       }
     } catch (err) {
-      setMessage(err.response?.data?.message || "Login failed. Please try again.");
+      setMessage("⚠ " + (err.response?.data?.message || "Login failed. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -61,13 +62,8 @@ const LoginPage = () => {
     e.preventDefault();
     setMessage("");
 
-    if (!name || !email || !password || !confirmPassword) {
-      setMessage("Please fill in all registration fields.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setMessage("Passwords do not match.");
+    if (!name || !email || !password || !role) {
+      setMessage("⚠ Please fill all registration fields.");
       return;
     }
 
@@ -78,109 +74,169 @@ const LoginPage = () => {
         name,
         email,
         password,
-        role,
+        role: role.toLowerCase(),
       });
 
       if (response.data) {
-        setMessage("Account created. Please login with your new details.");
-        setMode("login");
-        setName("");
-        setPassword("");
-        setConfirmPassword("");
+        setMessage("✅ Account Created Successfully!");
+        setTimeout(() => {
+          setMode("login");
+          setMessage("");
+        }, 1500);
       }
     } catch (err) {
-      setMessage(err.response?.data?.message || "Registration failed. Please try again later.");
+      setMessage("⚠ " + (err.response?.data?.message || "Registration failed."));
     } finally {
       setLoading(false);
     }
   };
 
+  const handleResetPassword = (e) => {
+    e.preventDefault();
+    setMessage("📧 Password Reset Link Sent!");
+  };
+
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <div className="auth-hero">
-          <div className="auth-brand">
-            <div className="auth-brand-icon">📚</div>
-            <div>
-              <div style={{ fontSize: "0.95rem", letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.9 }}>
-                I Love Library
-              </div>
-              <h1 className="auth-hero-title">College library access. Simplified.</h1>
-            </div>
+    <div className="login-container">
+      <div className="login-box">
+        {/* LOGIN */}
+        <div className={`form ${mode === "login" ? "active" : ""}`}>
+          <h2>Welcome to the Library Management System</h2>
+          <p className="subtitle">Login to continue...</p>
+
+          <div className="input-box">
+            <select value={role} onChange={(e) => setRole(e.target.value)}>
+              <option value="">Select Role</option>
+              <option value="student">Student</option>
+              <option value="admin">Admin</option>
+              <option value="librarian">Librarian</option>
+            </select>
           </div>
-          <p className="auth-hero-text">
-            Access your campus catalog, request books, and manage circulation with a real college library workflow.
-            Register once and sign in securely to continue.
-          </p>
+
+          <div className="input-box">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+            />
+          </div>
+
+          <div className="input-box">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+            />
+          </div>
+
+          <button onClick={handleLogin}>
+            {loading ? "Processing..." : "Login"}
+          </button>
+
+          <div className="links">
+            <a onClick={() => { setMode("register"); setMessage(""); }}>
+              Create Account
+            </a>{" "}
+            |{" "}
+            <a onClick={() => { setMode("forgot"); setMessage(""); }}>
+              Forgot Password?
+            </a>
+          </div>
+
+          <div
+            className="message"
+            style={{ color: message.startsWith("⚠") ? "salmon" : "lightgreen" }}
+          >
+            {message}
+          </div>
         </div>
 
-        <div className="auth-form">
-          <div className="auth-toggle">
-            <button type="button" className={mode === "login" ? "active" : ""} onClick={() => setMode("login")}>
-              Login
-            </button>
-            <button type="button" className={mode === "register" ? "active" : ""} onClick={() => setMode("register")}>
-              Register
-            </button>
+        {/* REGISTER */}
+        <div className={`form ${mode === "register" ? "active" : ""}`}>
+          <h2>Create Account</h2>
+
+          <div className="input-box">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Full Name"
+            />
           </div>
 
-          {message && <div className="auth-alert">{message}</div>}
+          <div className="input-box">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+            />
+          </div>
 
-          <form onSubmit={mode === "login" ? handleLogin : handleRegister}>
-            {mode === "register" && (
-              <div className="auth-input-group">
-                <label>Full Name</label>
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="John Doe" />
-              </div>
-            )}
+          <div className="input-box">
+            <select value={role} onChange={(e) => setRole(e.target.value)}>
+              <option value="">Select Role</option>
+              <option value="student">Student</option>
+              <option value="admin">Admin</option>
+              <option value="librarian">Librarian</option>
+            </select>
+          </div>
 
-            <div className="auth-input-group">
-              <label>Email Address</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@college.edu" />
-            </div>
+          <div className="input-box">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+            />
+          </div>
 
-            <div className="auth-input-group">
-              <label>Password</label>
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-              />
-            </div>
+          <button onClick={handleRegister}>
+            {loading ? "Processing..." : "Register"}
+          </button>
 
-            {mode === "register" && (
-              <div className="auth-input-group">
-                <label>Confirm Password</label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm your password"
-                />
-              </div>
-            )}
+          <div className="links">
+            <a onClick={() => { setMode("login"); setMessage(""); }}>
+              Back to Login
+            </a>
+          </div>
 
-            <div className="auth-input-group">
-              <label>Role</label>
-              <select value={role} onChange={(e) => setRole(e.target.value)}>
-                <option value="student">Student</option>
-                <option value="librarian">Librarian</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
+          <div
+            className="message"
+            style={{ color: message.startsWith("⚠") ? "salmon" : "lightgreen" }}
+          >
+            {message}
+          </div>
+        </div>
 
-            <button className="auth-submit" type="submit" disabled={loading}>
-              {loading ? "Processing..." : mode === "login" ? "Log In" : "Create Account"}
-            </button>
-          </form>
+        {/* FORGOT PASSWORD */}
+        <div className={`form ${mode === "forgot" ? "active" : ""}`}>
+          <h2>Forgot Password</h2>
 
-          <div className="auth-footer">
-            {mode === "login" ? (
-              <>Need a new account? <button type="button" onClick={() => setMode("register")}>Register here</button></>
-            ) : (
-              <>Already registered? <button type="button" onClick={() => setMode("login")}>Login here</button></>
-            )}
+          <div className="input-box">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+            />
+          </div>
+
+          <button onClick={handleResetPassword}>Reset Password</button>
+
+          <div className="links">
+            <a onClick={() => { setMode("login"); setMessage(""); }}>
+              Back to Login
+            </a>
+          </div>
+
+          <div
+            className="message"
+            style={{ color: message.startsWith("⚠") ? "salmon" : "lightgreen" }}
+          >
+            {message}
           </div>
         </div>
       </div>
