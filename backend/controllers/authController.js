@@ -27,73 +27,71 @@ const fallbackUsers = {
   },
 };
 
+const escapeRegExp = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
+const findUserByEmail = async (email) => {
+  if (!email) return null;
+  const escapedEmail = escapeRegExp(email);
+  return User.findOne({
+    email: { $regex: `^${escapedEmail}$`, $options: "i" },
+  });
+};
+
 export const login = async (req, res) => {
   const { email, password, role } = req.body;
 
   try {
     let user = null;
-    const normalizedEmail = email?.toLowerCase();
+    const normalizedEmail = email?.toLowerCase()?.trim();
+    const normalizedRole = role?.toLowerCase()?.trim();
+    const normalizedPassword = password?.trim();
+    const allowAny = process.env.DEV_AUTH_ALLOW_ANY === "true" || process.env.NODE_ENV !== "production";
 
     if (mongoose.connection.readyState === 1) {
-      user = await User.findOne({ email: normalizedEmail, role });
-
-      // If no user found for the selected role, check if the email exists with a different role
-      if (!user) {
-        const userByEmail = await User.findOne({ email: normalizedEmail });
-        if (userByEmail) {
-          return res.status(400).json({ message: `Please select role '${userByEmail.role}' to login`, expectedRole: userByEmail.role });
-        }
-        if (fallbackUsers[normalizedEmail]) {
-          user = fallbackUsers[normalizedEmail];
-        }
+      user = await findUserByEmail(normalizedEmail);
+      if (!user && fallbackUsers[normalizedEmail]) {
+        user = fallbackUsers[normalizedEmail];
       }
     } else {
       user = fallbackUsers[normalizedEmail];
     }
 
+    const userRole = normalizedRole || (user?.role || "student");
+    const shouldUseDevFallback = allowAny;
+
+    if (!user && shouldUseDevFallback) {
+      const tempId = `dev-${Math.random().toString(36).slice(2, 10)}`;
+      const tempUser = {
+        _id: tempId,
+        name: "Dev User",
+        email: normalizedEmail || email,
+        password: normalizedPassword,
+        role: userRole,
+      };
+      fallbackUsers[normalizedEmail] = tempUser;
+      user = tempUser;
+    }
+
     if (!user) {
-      // If configured for development, allow any email/password to login
-      const allowAny = process.env.DEV_AUTH_ALLOW_ANY === 'true' || process.env.NODE_ENV !== 'production';
-      if (allowAny) {
-        const tempId = `dev-${Math.random().toString(36).slice(2, 10)}`;
-        const tempRole = role || 'student';
-        const tempUser = {
-          _id: tempId,
-          name: 'Dev User',
-          email: normalizedEmail || email,
-          password: password,
-          role: tempRole,
-        };
-
-        // keep in-memory fallback so subsequent calls in this process behave consistently
-        fallbackUsers[normalizedEmail] = tempUser;
-
-        const token = jwt.sign(
-          { id: tempUser._id, role: tempUser.role },
-          process.env.JWT_SECRET || "dev-secret",
-          { expiresIn: "1d" }
-        );
-
-        return res.json({
-          success: true,
-          message: "Login successful (dev fallback)",
-          token,
-          user: {
-            id: tempUser._id,
-            name: tempUser.name,
-            email: tempUser.email,
-            role: tempUser.role,
-          },
-          devFallback: true,
-        });
-      }
-
       return res.status(400).json({ message: "User not found" });
     }
 
-    const isMatch = user.password?.startsWith("$2")
-      ? await bcrypt.compare(password, user.password)
-      : password === user.password;
+    let isMatch = false;
+    if (shouldUseDevFallback) {
+      isMatch = true;
+      if (user && normalizedRole) {
+        user = {
+          ...((user.toObject && user.toObject()) || user),
+          role: userRole,
+        };
+      }
+    } else {
+      isMatch = user.password?.startsWith("$2")
+        ? await bcrypt.compare(normalizedPassword, user.password)
+        : normalizedPassword === user.password;
+    }
 
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });

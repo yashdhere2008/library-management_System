@@ -28,11 +28,15 @@ const LoginPage = () => {
 
     setLoading(true);
 
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = password.trim();
+    const normalizedRole = role.trim().toLowerCase();
+
     try {
       const response = await API.post("/api/auth/login", {
-        email,
-        password,
-        role: role.toLowerCase(),
+        email: normalizedEmail,
+        password: normalizedPassword,
+        role: normalizedRole,
       });
 
       if (response.data.success) {
@@ -49,7 +53,12 @@ const LoginPage = () => {
       }
     } catch (err) {
       const serverMsg = err.response?.data?.message || "Login failed. Please try again.";
-      setMessage("⚠ " + serverMsg);
+      const networkError = err.response ? null : err.message;
+      if (networkError) {
+        setMessage("⚠ Backend not reachable. Please start the server.");
+      } else {
+        setMessage("⚠ " + serverMsg + (import.meta.env.VITE_DEBUG_API === 'true' ? ` — ${JSON.stringify(err.response?.data || serverMsg)}` : ""));
+      }
 
       // If server suggests the expected role, auto-select it and retry once
       const expected = err.response?.data?.expectedRole;

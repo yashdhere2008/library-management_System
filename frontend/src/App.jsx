@@ -5,14 +5,24 @@ import StudentDashboard from "./pages/Dashboard/studentdashboard.jsx";
 import LibrarianDashboard from "./pages/Dashboard/librarianDashboard.jsx";
 import AdminDashboard from "./pages/Dashboard/admindashboard.jsx";
 import LoginPage from "./pages/login/login.jsx";
+import { getDashboardPath } from "./lib/roleRoutes";
 
 function ProtectedRoute({ children, allowedRoles }) {
   const { user } = useAuth();
 
   if (!user) return <Navigate to="/" replace />;
-  if (!allowedRoles.includes(user.role)) return <Navigate to="/" replace />;
+  const role = (user.role || "").toLowerCase();
+  if (!allowedRoles.map((r) => r.toLowerCase()).includes(role)) return <Navigate to="/" replace />;
 
   return children;
+}
+
+function HomeOrRedirect() {
+  const { user } = useAuth();
+  if (user) {
+    return <Navigate to={getDashboardPath(user.role)} replace />;
+  }
+  return <LoginPage />;
 }
 
 function App() {
@@ -20,8 +30,8 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<HomeOrRedirect />} />
+          <Route path="/login" element={<HomeOrRedirect />} />
 
           <Route
             path="/student-dashboard"
@@ -49,6 +59,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/librarian-dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["librarian"]}>
+                <LibrarianDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="*" element={<HomeOrRedirect />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

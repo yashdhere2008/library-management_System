@@ -12,11 +12,10 @@ const getApiBaseUrl = () => {
   const port = window.location.port;
 
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    // Try the backend port (5008, 5007, 5005, etc.)
     return `http://${hostname}:5008`;
   }
 
-  // If running on a network IP, use the same IP with backend port
+  // If running on a network IP, use the same IP with backend port 5008.
   return `http://${hostname}:5008`;
 };
 
@@ -38,5 +37,24 @@ API.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Debugging: log requests and responses when VITE_DEBUG_API is set
+if (import.meta.env.VITE_DEBUG_API === 'true') {
+  API.interceptors.request.use((config) => {
+    console.debug('[API REQUEST]', config.method?.toUpperCase(), config.url, config.data || config.params || '');
+    return config;
+  });
+
+  API.interceptors.response.use(
+    (res) => {
+      console.debug('[API RESPONSE]', res.status, res.config.url, res.data);
+      return res;
+    },
+    (err) => {
+      console.debug('[API ERROR]', err.response?.status, err.response?.config?.url, err.response?.data || err.message);
+      return Promise.reject(err);
+    }
+  );
+}
 
 export default API;

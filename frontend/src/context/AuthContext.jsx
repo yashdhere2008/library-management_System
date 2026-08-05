@@ -8,15 +8,19 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const storedUser = localStorage.getItem("user");
-      return storedUser ? JSON.parse(storedUser) : null;
+      if (!storedUser) return null;
+      const parsed = JSON.parse(storedUser);
+      if (parsed && parsed.role) parsed.role = parsed.role.toLowerCase();
+      return parsed;
     } catch {
       return null;
     }
   });
 
   const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+    const normalized = { ...userData, role: userData.role ? userData.role.toLowerCase() : userData.role };
+    setUser(normalized);
+    localStorage.setItem("user", JSON.stringify(normalized));
   };
 
   const logout = () => {

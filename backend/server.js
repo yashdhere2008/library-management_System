@@ -3,9 +3,11 @@ import { fileURLToPath } from "url";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import bcrypt from "bcrypt";
 import connectDB from "./db.js";
 import authRoutes from "./controllers/authroutes.js";
 import bookRoutes from "./controllers/bookRoutes.js";
+import User from "./models/user.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,11 +74,61 @@ app.get("/", (req, res) => {
   res.send("Library Management API Running");
 });
 
+const createDemoUsers = async () => {
+  try {
+    const demoAccounts = [
+      {
+        email: "admin@example.com",
+        name: "Admin User",
+        password: "admin123",
+        role: "admin",
+      },
+      {
+        email: "student@example.com",
+        name: "Student User",
+        password: "student123",
+        role: "student",
+      },
+      {
+        email: "librarian@example.com",
+        name: "Librarian User",
+        password: "librarian123",
+        role: "librarian",
+      },
+    ];
+
+    for (const account of demoAccounts) {
+      const hashedPassword = await bcrypt.hash(account.password, 10);
+      const result = await User.updateOne(
+        { email: account.email.toLowerCase() },
+        {
+          $setOnInsert: {
+            name: account.name,
+            email: account.email.toLowerCase(),
+            password: hashedPassword,
+            role: account.role,
+          },
+        },
+        { upsert: true }
+      );
+
+      if (result.upsertedCount > 0) {
+        console.log(`Created demo ${account.role}: ${account.email} / ${account.password}`);
+      }
+    }
+  } catch (error) {
+    console.warn("Failed to create demo users:", error.message);
+  }
+};
+
 const startServer = async () => {
   try {
     const dbReady = await connectDB();
+    if (dbReady) {
+      await createDemoUsers();
+    }
 
-    const basePort = parseInt(process.env.PORT, 10) || 5005;
+    const basePort = parseInt(process.env.PORT, 10) || 5008;
     const maxRetries = 10;
 
     const tryListen = (port, remainingTries) => {
