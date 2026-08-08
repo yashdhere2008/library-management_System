@@ -20,8 +20,11 @@ const getApiBaseUrl = () => {
   return `http://${hostname}:5009`;
 };
 
+const apiBaseUrl = getApiBaseUrl();
+console.info('[API BASE URL]', apiBaseUrl);
+
 const API = axios.create({
-  baseURL: getApiBaseUrl(),
+  baseURL: apiBaseUrl,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
