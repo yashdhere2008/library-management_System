@@ -7,7 +7,9 @@ import bcrypt from "bcrypt";
 import connectDB from "./db.js";
 import authRoutes from "./controllers/authroutes.js";
 import bookRoutes from "./controllers/bookRoutes.js";
+import studentRoutes from "./controllers/studentRoutes.js";
 import User from "./models/user.js";
+import Book from "./models/book.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -69,6 +71,7 @@ app.use(cors({
 
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
+app.use("/api/students", studentRoutes);
 
 app.get("/", (req, res) => {
   res.send("Library Management API Running");
@@ -121,11 +124,37 @@ const createDemoUsers = async () => {
   }
 };
 
+const createDemoBooks = async () => {
+  try {
+    const demoBooks = [
+      { title: "Programming Fundamentals", author: "R. Sharma", isbn: "SEM1-PF-001", category: "Programming", semester: 1, totalCopies: 3, availableCopies: 3 },
+      { title: "Mathematics for Computing", author: "R. Kulkarni", isbn: "SEM1-MATH-002", category: "Mathematics", semester: 1, totalCopies: 2, availableCopies: 2 },
+      { title: "Data Structures", author: "Mark Weiss", isbn: "SEM2-DS-003", category: "Programming", semester: 2, totalCopies: 4, availableCopies: 4 },
+      { title: "DBMS", author: "Korth", isbn: "SEM2-DBMS-004", category: "Database", semester: 2, totalCopies: 2, availableCopies: 2 },
+      { title: "Java Programming", author: "James Gosling", isbn: "SEM3-JAVA-005", category: "Programming", semester: 3, totalCopies: 5, availableCopies: 5 },
+      { title: "Computer Networks", author: "Tanenbaum", isbn: "SEM4-NET-006", category: "Networking", semester: 4, totalCopies: 2, availableCopies: 2 },
+      { title: "Operating Systems", author: "Galvin", isbn: "SEM5-OS-007", category: "Systems", semester: 5, totalCopies: 3, availableCopies: 3 },
+      { title: "Artificial Intelligence", author: "Stuart Russell", isbn: "SEM6-AI-008", category: "AI", semester: 6, totalCopies: 2, availableCopies: 2 },
+      { title: "Software Engineering", author: "Ian Sommerville", isbn: "SEM7-SE-009", category: "Engineering", semester: 7, totalCopies: 2, availableCopies: 2 },
+      { title: "Cloud Computing", author: "A. Smith", isbn: "SEM8-CC-010", category: "Cloud", semester: 8, totalCopies: 2, availableCopies: 2 }
+    ];
+
+    const count = await Book.countDocuments();
+    if (count === 0) {
+      await Book.insertMany(demoBooks);
+      console.log("Created seed books in MongoDB.");
+    }
+  } catch (error) {
+    console.warn("Failed to create seed books:", error.message);
+  }
+};
+
 const startServer = async () => {
   try {
     const dbReady = await connectDB();
     if (dbReady) {
       await createDemoUsers();
+      await createDemoBooks();
     }
 
     const basePort = parseInt(process.env.PORT, 10) || 5008;

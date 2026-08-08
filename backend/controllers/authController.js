@@ -122,16 +122,21 @@ export const login = async (req, res) => {
 export const register = async (req, res) => {
   const { name, email, password, role } = req.body;
 
-  if (!name || !email || !password || !role) {
+  if (!name || !email || !password) {
     return res.status(400).json({ message: "All fields are required for registration" });
   }
 
   try {
-    const normalizedEmail = email.toLowerCase();
+    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedRole = (role || "student").toLowerCase().trim();
+
+    if (!["student", "admin", "librarian"].includes(normalizedRole)) {
+      return res.status(400).json({ message: "Unsupported role" });
+    }
 
     if (mongoose.connection.readyState !== 1) {
       if (fallbackUsers[normalizedEmail]) {
-        return res.status(400).json({ message: "User already exists with this email and role" });
+        return res.status(400).json({ message: "User already exists with this email" });
       }
 
       const tempId = `fallback-${Math.random().toString(36).slice(2, 10)}`;
@@ -140,11 +145,11 @@ export const register = async (req, res) => {
         name,
         email: normalizedEmail,
         password,
-        role,
+        role: normalizedRole,
       };
 
       const token = jwt.sign(
-        { id: tempId, role },
+        { id: tempId, role: normalizedRole },
         process.env.JWT_SECRET || "dev-secret",
         { expiresIn: "1d" }
       );
@@ -157,15 +162,15 @@ export const register = async (req, res) => {
           id: tempId,
           name,
           email: normalizedEmail,
-          role,
+          role: normalizedRole,
         },
       });
     }
 
-    const existingUser = await User.findOne({ email: normalizedEmail, role });
+    const existingUser = await User.findOne({ email: normalizedEmail });
 
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists with this email and role" });
+      return res.status(400).json({ message: "User already exists with this email" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -174,7 +179,7 @@ export const register = async (req, res) => {
       name,
       email: normalizedEmail,
       password: hashedPassword,
-      role,
+      role: normalizedRole,
     });
 
     await newUser.save();

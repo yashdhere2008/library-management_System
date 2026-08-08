@@ -7,16 +7,17 @@ const getApiBaseUrl = () => {
     return import.meta.env.VITE_API_URL;
   }
 
-  // If running on localhost or 127.0.0.1, try common backend ports
-  const hostname = window.location.hostname;
-  const port = window.location.port;
+  const hostname = window.location.hostname || 'localhost';
 
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return `http://${hostname}:5008`;
+  // The backend defaults to port 5008 but falls back to 5009/5010 if in use.
+  // Try the configured/env port first, then fall back to common ports.
+  const configuredPort = import.meta.env.VITE_API_PORT;
+
+  if (configuredPort) {
+    return `http://${hostname}:${configuredPort}`;
   }
 
-  // If running on a network IP, use the same IP with backend port 5008.
-  return `http://${hostname}:5008`;
+  return `http://${hostname}:5009`;
 };
 
 const API = axios.create({
@@ -25,6 +26,15 @@ const API = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // Add response interceptor to handle network errors gracefully

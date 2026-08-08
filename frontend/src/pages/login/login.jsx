@@ -21,8 +21,8 @@ const LoginPage = () => {
   const submitLogin = async () => {
     setMessage("");
 
-    if (!role || !email || !password) {
-      setMessage("⚠ Please fill all fields!");
+    if (!email || !password) {
+      setMessage("⚠ Please fill email and password!");
       return;
     }
 
@@ -30,14 +30,19 @@ const LoginPage = () => {
 
     const normalizedEmail = email.trim().toLowerCase();
     const normalizedPassword = password.trim();
-    const normalizedRole = role.trim().toLowerCase();
+    const normalizedRole = role?.trim().toLowerCase();
 
     try {
-      const response = await API.post("/api/auth/login", {
+      const payload = {
         email: normalizedEmail,
         password: normalizedPassword,
-        role: normalizedRole,
-      });
+      };
+
+      if (normalizedRole) {
+        payload.role = normalizedRole;
+      }
+
+      const response = await API.post("/api/auth/login", payload);
 
       if (response.data.success) {
         setMessage("✅ Login successfully");
@@ -82,7 +87,7 @@ const LoginPage = () => {
     e.preventDefault();
     setMessage("");
 
-    if (!name || !email || !password || !role) {
+    if (!name || !email || !password) {
       setMessage("⚠ Please fill all registration fields.");
       return;
     }
@@ -90,11 +95,13 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
+      const normalizedRole = role && role.trim() ? role.trim().toLowerCase() : 'student';
+
       const response = await API.post("/api/auth/register", {
         name,
         email,
         password,
-        role: role.toLowerCase(),
+        role: normalizedRole,
       });
 
       if (response.data) {
