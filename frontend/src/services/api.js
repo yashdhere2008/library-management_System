@@ -17,7 +17,7 @@ const getApiBaseUrl = () => {
     return `http://${hostname}:${configuredPort}`;
   }
 
-  return `http://${hostname}:5009`;
+  return `http://${hostname}:5008`;
 };
 
 const apiBaseUrl = getApiBaseUrl();
