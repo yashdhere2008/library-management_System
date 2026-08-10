@@ -1,37 +1,58 @@
 import axios from "axios";
 
-// Dynamically determine API base URL based on current location
-const getApiBaseUrl = () => {
-  // Get the API URL from environment variable first
+// Dynamically determine API base URL based on current location and port connectivity
+let apiBaseUrlPromise = null;
+const detectApiBaseUrl = async () => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
 
   const hostname = window.location.hostname || 'localhost';
-
-  // The backend defaults to port 5008 but falls back to 5009/5010 if in use.
-  // Try the configured/env port first, then fall back to common ports.
   const configuredPort = import.meta.env.VITE_API_PORT;
 
   if (configuredPort) {
     return `http://${hostname}:${configuredPort}`;
   }
 
+  // Try candidate ports in order (5008, 5009, 5010, 5011, 5012)
+  const candidatePorts = [5008, 5009, 5010, 5011, 5012];
+  for (const port of candidatePorts) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 200);
+
+      // Fast check request
+      await fetch(`http://${hostname}:${port}/`, {
+        signal: controller.signal,
+        mode: 'no-cors' // Use no-cors to prevent preflight errors for checking presence
+      });
+
+      clearTimeout(timeoutId);
+      console.info(`[API DETECT] Found backend active on port: ${port}`);
+      return `http://${hostname}:${port}`;
+    } catch (err) {
+      // Server not running on this port
+    }
+  }
+
+  // Default fallback
   return `http://${hostname}:5008`;
 };
 
-const apiBaseUrl = getApiBaseUrl();
-console.info('[API BASE URL]', apiBaseUrl);
+apiBaseUrlPromise = detectApiBaseUrl();
 
 const API = axios.create({
-  baseURL: apiBaseUrl,
+  baseURL: `http://localhost:5008`,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-API.interceptors.request.use((config) => {
+API.interceptors.request.use(async (config) => {
+  const detectedBaseUrl = await apiBaseUrlPromise;
+  config.baseURL = detectedBaseUrl;
+
   const token = localStorage.getItem('token');
   if (token) {
     config.headers = config.headers || {};

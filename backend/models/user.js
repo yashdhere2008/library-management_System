@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
 
+  rollNo: {
+    type: String,
+    sparse: true,
+  },
+
   // ✅ New Field - Student Book Credit
   credit: {
     type: Number,

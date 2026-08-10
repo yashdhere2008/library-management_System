@@ -47,7 +47,6 @@ export const login = async (req, res) => {
     const normalizedEmail = email?.toLowerCase()?.trim();
     const normalizedRole = role?.toLowerCase()?.trim();
     const normalizedPassword = password?.trim();
-    const allowAny = process.env.DEV_AUTH_ALLOW_ANY === "true" || process.env.NODE_ENV !== "production";
 
     if (mongoose.connection.readyState === 1) {
       user = await findUserByEmail(normalizedEmail);
@@ -58,40 +57,20 @@ export const login = async (req, res) => {
       user = fallbackUsers[normalizedEmail];
     }
 
-    const userRole = normalizedRole || (user?.role || "student");
-    const shouldUseDevFallback = allowAny;
-
-    if (!user && shouldUseDevFallback) {
-      const tempId = `dev-${Math.random().toString(36).slice(2, 10)}`;
-      const tempUser = {
-        _id: tempId,
-        name: "Dev User",
-        email: normalizedEmail || email,
-        password: normalizedPassword,
-        role: userRole,
-      };
-      fallbackUsers[normalizedEmail] = tempUser;
-      user = tempUser;
-    }
-
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    let isMatch = false;
-    if (shouldUseDevFallback) {
-      isMatch = true;
-      if (user && normalizedRole) {
-        user = {
-          ...((user.toObject && user.toObject()) || user),
-          role: userRole,
-        };
-      }
-    } else {
-      isMatch = user.password?.startsWith("$2")
-        ? await bcrypt.compare(normalizedPassword, user.password)
-        : normalizedPassword === user.password;
+    // Force role check if role is specified
+    const userRole = user.role || "student";
+    if (normalizedRole && normalizedRole !== userRole.toLowerCase()) {
+      return res.status(400).json({ message: `Access denied. Account is registered as ${userRole}.` });
     }
+
+    // Check password
+    const isMatch = user.password?.startsWith("$2")
+      ? await bcrypt.compare(normalizedPassword, user.password)
+      : normalizedPassword === user.password;
 
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -112,6 +91,9 @@ export const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        rollNo: user.rollNo || undefined,
+        credit: user.credit ?? 5,
+        maxBooks: user.maxBooks ?? 5,
       },
     });
   } catch (error) {
@@ -120,7 +102,7 @@ export const login = async (req, res) => {
 };
 
 export const register = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, rollNo } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({ message: "All fields are required for registration" });
@@ -134,19 +116,27 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "Unsupported role" });
     }
 
+    if (normalizedRole === "student" && !rollNo) {
+      return res.status(400).json({ message: "Roll number is required for students" });
+    }
+
     if (mongoose.connection.readyState !== 1) {
       if (fallbackUsers[normalizedEmail]) {
         return res.status(400).json({ message: "User already exists with this email" });
       }
 
       const tempId = `fallback-${Math.random().toString(36).slice(2, 10)}`;
-      fallbackUsers[normalizedEmail] = {
+      const tempUser = {
         _id: tempId,
         name,
         email: normalizedEmail,
         password,
         role: normalizedRole,
+        rollNo: normalizedRole === "student" ? rollNo.trim() : undefined,
+        credit: 5,
+        maxBooks: 5,
       };
+      fallbackUsers[normalizedEmail] = tempUser;
 
       const token = jwt.sign(
         { id: tempId, role: normalizedRole },
@@ -163,6 +153,9 @@ export const register = async (req, res) => {
           name,
           email: normalizedEmail,
           role: normalizedRole,
+          rollNo: tempUser.rollNo,
+          credit: 5,
+          maxBooks: 5,
         },
       });
     }
@@ -180,6 +173,7 @@ export const register = async (req, res) => {
       email: normalizedEmail,
       password: hashedPassword,
       role: normalizedRole,
+      rollNo: normalizedRole === "student" ? rollNo.trim() : undefined,
     });
 
     await newUser.save();
@@ -192,9 +186,40 @@ export const register = async (req, res) => {
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
+        rollNo: newUser.rollNo,
+        credit: newUser.credit,
+        maxBooks: newUser.maxBooks,
       },
     });
   } catch (error) {
     res.status(500).json({ message: "Registration failed", error: error.message });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword || !newPassword) {
+    return res.status(400).json({ message: "Old and new password are required" });
+  }
+
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const isMatch = user.password?.startsWith("$2")
+      ? await bcrypt.compare(oldPassword.trim(), user.password)
+      : oldPassword.trim() === user.password;
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Old password is incorrect" });
+    }
+
+    user.password = await bcrypt.hash(newPassword.trim(), 10);
+    await user.save();
+
+    return res.json({ success: true, message: "Password changed successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
 };

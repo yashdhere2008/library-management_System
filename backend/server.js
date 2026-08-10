@@ -8,6 +8,7 @@ import connectDB from "./db.js";
 import authRoutes from "./controllers/authroutes.js";
 import bookRoutes from "./controllers/bookRoutes.js";
 import studentRoutes from "./controllers/studentRoutes.js";
+import adminRoutes from "./controllers/adminRoutes.js";
 import User from "./models/user.js";
 import Book from "./models/book.js";
 
@@ -72,6 +73,7 @@ app.use(cors({
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/students", studentRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/", (req, res) => {
   res.send("Library Management API Running");
