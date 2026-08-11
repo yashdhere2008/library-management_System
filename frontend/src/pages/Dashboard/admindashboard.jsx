@@ -78,6 +78,24 @@ const AdminDashboard = () => {
   // ── Handlers ─────────────────────────────────────────────────────────────────
   const handleLogout = () => { logout(); navigate('/'); };
 
+  const handleRefreshIssues = async () => {
+    setLoading(true);
+    try {
+      await loadIssues();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefreshBooks = async () => {
+    setLoading(true);
+    try {
+      await loadBooks();
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDeleteUser = async (userId, name) => {
     if (!window.confirm(`Delete user "${name}"? This cannot be undone.`)) return;
     try {
@@ -112,16 +130,16 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container dashboard-admin">
       {/* Sidebar */}
       <div className="sidebar">
-        <h2>🛡️ Admin</h2>
-        <div style={{ padding: '8px 0', fontSize: '13px', color: '#ccc', borderBottom: '1px solid #334155', marginBottom: '12px' }}>
-          👤 {user?.name || user?.email || 'Admin'}
+        <h2>🏛️ College Admin</h2>
+        <div style={{ padding: '8px 0', fontSize: '12px', color: '#64748b', borderBottom: '1px solid #e2e8f0', marginBottom: '12px' }}>
+          👤 {user?.name || user?.email || 'College Admin'}
         </div>
 
-        <a className={activeTab === 'dashboard' ? 'active' : ''} onClick={() => setActiveTab('dashboard')}>🏠 Dashboard</a>
-        <a className={activeTab === 'users' ? 'active' : ''} onClick={() => setActiveTab('users')}>👥 Manage Users</a>
+        <a className={activeTab === 'dashboard' ? 'active' : ''} onClick={() => setActiveTab('dashboard')}>�️ Dashboard</a>
+        <a className={activeTab === 'users' ? 'active' : ''} onClick={() => setActiveTab('users')}>👨‍🏫 Manage Users</a>
         <a className={activeTab === 'issues' ? 'active' : ''} onClick={() => setActiveTab('issues')}>📖 All Issues</a>
         <a className={activeTab === 'books' ? 'active' : ''} onClick={() => setActiveTab('books')}>📚 All Books</a>
         <a className="logout" onClick={handleLogout}>🚪 Logout</a>
@@ -134,8 +152,8 @@ const AdminDashboard = () => {
         {/* ── DASHBOARD ── */}
         {activeTab === 'dashboard' && !loading && (
           <div>
-            <h1>Admin Overview 🛡️</h1>
-            <p style={{ color: '#666', marginBottom: '16px' }}>Logged in as <strong>{user?.email}</strong></p>
+            <h1>Admin Overview 🏛️</h1>
+            <p style={{ color: '#64748b', marginBottom: '16px' }}>Logged in as <strong>{user?.name || user?.email || 'College Admin'}</strong></p>
 
             <div className="cards">
               <div className="card"><h3>Total Books</h3><h1>{stats?.totalBooks ?? '—'}</h1></div>
@@ -186,7 +204,7 @@ const AdminDashboard = () => {
         {/* ── MANAGE USERS ── */}
         {activeTab === 'users' && (
           <div>
-            <h1>Manage Users</h1>
+            <h1>👨‍🏫 Manage Users</h1>
             {actionMsg && <div style={{ color: actionMsg.startsWith('⚠') ? 'red' : 'green', marginBottom: '12px', fontWeight: 'bold' }}>{actionMsg}</div>}
 
             {/* Filters */}
@@ -201,7 +219,7 @@ const AdminDashboard = () => {
                 <option value="librarian">Librarians</option>
                 <option value="admin">Admins</option>
               </select>
-              <button onClick={loadUsers} style={{ padding: '8px 16px', borderRadius: '8px', cursor: 'pointer' }}>🔄 Refresh</button>
+              <button type="button" onClick={loadUsers} style={{ padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px' }}>🔄 Refresh</button>
             </div>
 
             <table>
@@ -263,7 +281,7 @@ const AdminDashboard = () => {
         {activeTab === 'issues' && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-              <h1>All Book Issues</h1>
+              <h1>📖 All Book Issues</h1>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <select value={issueStatusFilter} onChange={e => setIssueStatusFilter(e.target.value)}
                   style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
@@ -272,7 +290,7 @@ const AdminDashboard = () => {
                   <option value="Overdue">Overdue</option>
                   <option value="Returned">Returned</option>
                 </select>
-                <button onClick={loadIssues} style={{ padding: '8px 16px', borderRadius: '8px', cursor: 'pointer' }}>🔄 Refresh</button>
+                <button type="button" onClick={handleRefreshIssues} style={{ padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px' }}>🔄 Refresh</button>
               </div>
             </div>
 
@@ -304,8 +322,8 @@ const AdminDashboard = () => {
         {activeTab === 'books' && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h1>All Books</h1>
-              <button onClick={loadBooks} style={{ padding: '8px 16px', borderRadius: '8px', cursor: 'pointer' }}>🔄 Refresh</button>
+              <h1>📚 All Books</h1>
+              <button type="button" onClick={handleRefreshBooks} style={{ padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px' }}>🔄 Refresh</button>
             </div>
             <table>
               <thead><tr><th>Title</th><th>Author</th><th>ISBN</th><th>Category</th><th>Semester</th><th>Total</th><th>Available</th></tr></thead>

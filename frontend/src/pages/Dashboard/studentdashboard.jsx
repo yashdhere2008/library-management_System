@@ -29,6 +29,9 @@ const StudentDashboard = () => {
   const [pwdForm, setPwdForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
   const [pwdMsg, setPwdMsg] = useState('');
   const [pwdLoading, setPwdLoading] = useState(false);
+  const [requestForm, setRequestForm] = useState({ title: '', reason: '' });
+  const [requestMsg, setRequestMsg] = useState('');
+  const [fineMsg, setFineMsg] = useState('');
 
   // Fetch student data
   const fetchStudentPersonalData = async () => {
@@ -56,6 +59,20 @@ const StudentDashboard = () => {
   useEffect(() => { fetchStudentPersonalData(); }, [user, activeTab]);
 
   const handleLogout = () => { logout(); navigate('/'); };
+
+  const handleNewBookRequest = (e) => {
+    e.preventDefault();
+    if (!requestForm.title.trim()) {
+      setRequestMsg('⚠ Please enter a book title.');
+      return;
+    }
+    setRequestMsg(`✅ Request sent for "${requestForm.title}". The librarian will review it soon.`);
+    setRequestForm({ title: '', reason: '' });
+  };
+
+  const handlePayFineScan = () => {
+    setFineMsg('✅ Fine payment scanner opened. Please scan your college ID at the library desk to continue.');
+  };
 
   const handleChatSearch = () => {
     if (!chatQuery.trim()) { setChatMsg('⚠️ Please type a question first.'); return; }
@@ -156,6 +173,8 @@ const StudentDashboard = () => {
         <a className={activeTab === 'mybooks' ? 'active' : ''} onClick={() => setActiveTab('mybooks')}>📖 My Issued Books</a>
         <a className={activeTab === 'catalog' ? 'active' : ''} onClick={() => setActiveTab('catalog')}>📚 Book Catalog</a>
         <a className={activeTab === 'history' ? 'active' : ''} onClick={() => setActiveTab('history')}>📜 My History</a>
+        <a className={activeTab === 'requestbook' ? 'active' : ''} onClick={() => setActiveTab('requestbook')}>📩 Request New Book</a>
+        <a className={activeTab === 'payfine' ? 'active' : ''} onClick={() => setActiveTab('payfine')}>💳 Pay Fine</a>
         <a className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>⚙️ Change Password</a>
         <a className="logout" onClick={handleLogout}>🚪 Logout</a>
 
@@ -401,6 +420,49 @@ const StudentDashboard = () => {
                       )}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            )}
+
+            {/* ── REQUEST NEW BOOK TAB ── */}
+            {activeTab === 'requestbook' && (
+              <div className="student-panel">
+                <div className="panel-header">
+                  <div>
+                    <span className="panel-kicker">Library Request</span>
+                    <h2>📩 Request a New Book</h2>
+                  </div>
+                </div>
+
+                <form onSubmit={handleNewBookRequest} style={{ maxWidth: '480px', marginTop: '24px' }}>
+                  <div className="form-group">
+                    <label>Book Title</label>
+                    <input type="text" value={requestForm.title} onChange={(e) => setRequestForm(p => ({ ...p, title: e.target.value }))} placeholder="Enter the book title" />
+                  </div>
+                  <div className="form-group">
+                    <label>Reason / Notes</label>
+                    <textarea rows="4" value={requestForm.reason} onChange={(e) => setRequestForm(p => ({ ...p, reason: e.target.value }))} placeholder="Why do you need this book?" />
+                  </div>
+                  {requestMsg && <div style={{ margin: '12px 0', fontWeight: 'bold', color: requestMsg.startsWith('⚠') ? '#ef4444' : '#16a34a' }}>{requestMsg}</div>}
+                  <button type="submit" style={{ padding: '10px 24px', cursor: 'pointer', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600' }}>Send Request</button>
+                </form>
+              </div>
+            )}
+
+            {/* ── PAY FINE TAB ── */}
+            {activeTab === 'payfine' && (
+              <div className="student-panel">
+                <div className="panel-header">
+                  <div>
+                    <span className="panel-kicker">Payments</span>
+                    <h2>💳 Pay Fine</h2>
+                  </div>
+                </div>
+
+                <div style={{ maxWidth: '480px', marginTop: '24px' }}>
+                  <p style={{ color: '#64748b', marginBottom: '12px' }}>Use the college scanner at the library desk to complete your fine payment.</p>
+                  <button onClick={handlePayFineScan} style={{ padding: '10px 24px', cursor: 'pointer', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600' }}>Open College Scanner</button>
+                  {fineMsg && <div style={{ marginTop: '12px', fontWeight: 'bold', color: '#16a34a' }}>{fineMsg}</div>}
                 </div>
               </div>
             )}

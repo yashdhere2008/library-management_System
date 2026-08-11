@@ -30,6 +30,9 @@ const LibrarianDashboard = () => {
   const [editingBookId, setEditingBookId] = useState('');
   const [bookFormError, setBookFormError] = useState('');
   const [bookFormSuccess, setBookFormSuccess] = useState('');
+  const [studentForm, setStudentForm] = useState({ name: '', email: '', password: '', rollNo: '' });
+  const [studentFormMsg, setStudentFormMsg] = useState('');
+  const [studentFormLoading, setStudentFormLoading] = useState(false);
 
   // ── Data loaders ────────────────────────────────────────────────────────────
   const loadBooks = useCallback(async () => {
@@ -103,6 +106,32 @@ const LibrarianDashboard = () => {
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
   const handleLogout = () => { logout(); navigate('/'); };
+
+  const handleRegisterStudent = async (e) => {
+    e.preventDefault();
+    setStudentFormMsg('');
+    if (!studentForm.name || !studentForm.email || !studentForm.password || !studentForm.rollNo) {
+      setStudentFormMsg('⚠ Please fill all student details.');
+      return;
+    }
+    setStudentFormLoading(true);
+    try {
+      await API.post('/api/auth/register', {
+        name: studentForm.name,
+        email: studentForm.email,
+        password: studentForm.password,
+        role: 'student',
+        rollNo: studentForm.rollNo,
+      });
+      setStudentFormMsg('✅ Student registered successfully.');
+      setStudentForm({ name: '', email: '', password: '', rollNo: '' });
+      await loadStudents();
+    } catch (err) {
+      setStudentFormMsg('⚠ ' + (err.response?.data?.message || 'Failed to register student.'));
+    } finally {
+      setStudentFormLoading(false);
+    }
+  };
 
   const handleBookInput = (e) => {
     const { name, value } = e.target;
@@ -236,6 +265,8 @@ const LibrarianDashboard = () => {
         </div>
 
         <a className={activeTab === 'dashboard' ? 'active' : ''} onClick={() => setActiveTab('dashboard')}>🏠 Dashboard</a>
+        <a className={activeTab === 'students' ? 'active' : ''} onClick={() => setActiveTab('students')}>👨‍🎓 Students</a>
+        <a className={activeTab === 'registerstudent' ? 'active' : ''} onClick={() => setActiveTab('registerstudent')}>📝 Register Student</a>
         <a className={activeTab === 'books' ? 'active' : ''} onClick={() => setActiveTab('books')}>📚 Manage Books</a>
         <a className={activeTab === 'addbook' ? 'active' : ''} onClick={() => setActiveTab('addbook')}>➕ Add Book</a>
         <a className={activeTab === 'issue' ? 'active' : ''} onClick={() => setActiveTab('issue')}>📖 Issue Books</a>
@@ -261,8 +292,8 @@ const LibrarianDashboard = () => {
         {/* ── DASHBOARD ── */}
         {activeTab === 'dashboard' && !loading && (
           <div>
-            <h1>Welcome back, {user?.name || 'Librarian'}! 👋</h1>
-            <p style={{ color: '#666', marginBottom: '15px' }}>Account: <strong>{user?.email}</strong></p>
+            <h1 style={{ fontSize: '22px' }}>Welcome back, {user?.name || 'Librarian'}! 👋</h1>
+            <p style={{ color: '#666', marginBottom: '15px', fontSize: '13px' }}>Account: <strong>{user?.email}</strong></p>
 
             <div className="cards">
               <div className="card"><h3>Total Books</h3><h1>{books.length}</h1></div>
@@ -301,6 +332,52 @@ const LibrarianDashboard = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* ── STUDENTS ── */}
+        {activeTab === 'students' && (
+          <div>
+            <h1>👨‍🎓 Students</h1>
+            <table>
+              <thead><tr><th>Name</th><th>Email</th><th>Roll No</th><th>Credit</th></tr></thead>
+              <tbody>
+                {students.map(s => (
+                  <tr key={s._id}>
+                    <td>{s.name}</td><td>{s.email}</td>
+                    <td>{s.rollNo || '—'}</td>
+                    <td>{s.credit ?? '—'}/{s.maxBooks ?? '—'}</td>
+                  </tr>
+                ))}
+                {students.length === 0 && <tr><td colSpan="4" style={{ textAlign: 'center', padding: '20px', color: '#666' }}>No students found.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {activeTab === 'registerstudent' && (
+          <div>
+            <h1>📝 Register Student</h1>
+            <form onSubmit={handleRegisterStudent} style={{ maxWidth: '450px', marginTop: '12px' }}>
+              <div className="form-group">
+                <label>Full Name</label>
+                <input type="text" value={studentForm.name} onChange={(e) => setStudentForm(p => ({ ...p, name: e.target.value }))} placeholder="Enter student name" />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input type="email" value={studentForm.email} onChange={(e) => setStudentForm(p => ({ ...p, email: e.target.value }))} placeholder="student@example.com" />
+              </div>
+              <div className="form-group">
+                <label>Password</label>
+                <input type="password" value={studentForm.password} onChange={(e) => setStudentForm(p => ({ ...p, password: e.target.value }))} placeholder="Create password" />
+              </div>
+              <div className="form-group">
+                <label>Roll Number</label>
+                <input type="text" value={studentForm.rollNo} onChange={(e) => setStudentForm(p => ({ ...p, rollNo: e.target.value }))} placeholder="Enter roll number" />
+              </div>
+              {studentFormMsg && <div style={{ marginBottom: '10px', color: studentFormMsg.startsWith('⚠') ? '#b91c1c' : '#166534' }}>{studentFormMsg}</div>}
+              <button type="submit" disabled={studentFormLoading}>{studentFormLoading ? 'Registering...' : 'Register Student'}</button>
+            </form>
           </div>
         )}
 
