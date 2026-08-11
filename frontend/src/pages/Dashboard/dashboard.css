@@ -32,12 +32,12 @@
     gap: 8px; 
     color: #000; 
     text-decoration: none; 
-    padding: 10px 12px; 
+    padding: 8px 10px; 
     border-radius: 6px; 
-    margin: 7px 0; 
+    margin: 3px 0; 
     cursor: pointer; 
     border: 1px solid transparent; 
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
 }
 .dashboard-admin .sidebar a { color: #111111; }
@@ -52,15 +52,22 @@
 .dashboard-container .sidebar a.active { background: #111111; color: #fff; }
 
 .dashboard-container .logout { 
-    margin-top: 16px; 
+    margin-top: 6px; 
+    margin-bottom: 4px; 
     border: none !important; 
     background: #dc2626 !important; 
-    color: #fff !important; 
+    color: #ffffff !important; 
     text-align: center; 
-    font-size: 13px; 
-    padding: 10px 12px; 
-    border-radius: 8px;
+    font-size: 12px; 
+    font-weight: 700; 
+    padding: 6px 8px; 
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.2);
+    display: block;
 }
+.dashboard-admin .logout { background: #dc2626 !important; color: #ffffff !important; }
+
+.dashboard-container .logout:hover { background: #b91c1c !important; color: #ffffff !important; }
 .dashboard-admin .logout { background: #dc2626 !important; color: #fff !important; }
 
 .dashboard-container .logout:hover { background: #b91c1c !important; color: #fff !important; }
