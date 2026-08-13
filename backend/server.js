@@ -43,7 +43,7 @@ app.use(cors({
 
       // Allow explicitly configured hosts
       const allowedOrigins = [
-        "http://localhost:3000",
+        "https://library-management-system-iyzk.onrender.com",
         "http://127.0.0.1:5173",
       ];
 
@@ -165,7 +165,7 @@ const startServer = async () => {
     const tryListen = (port, remainingTries) => {
       const server = app.listen(port, '0.0.0.0', () => {
         console.log(`🚀 Server running on http://0.0.0.0:${port}`);
-        console.log(`   Local access:   http://localhost:${port}`);
+        console.log(`   Local access:   http://localhost:5008:${port}`);
         console.log(`   Network access: http://<your-ip>:${port}`);
         if (!dbReady) {
           console.warn("⚠️ MongoDB is not connected, but the server is running in fallback mode.");
